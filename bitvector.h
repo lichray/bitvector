@@ -27,12 +27,40 @@
 #define _BITVECTOR_H 1
 
 #include <memory>
+#include <limits>
+#include <climits>
+#include <bitset>
+#include <boost/compressed_pair.hpp>
 
 namespace stdex {
 
 template <typename Allocator>
 struct basic_bitvector
 {
+	typedef Allocator allocator_type;
+
+private:
+	typedef std::allocator_traits<allocator_type> _alloc_traits;
+	typedef typename _alloc_traits::value_type _block_type;
+	static_assert(std::is_unsigned<_block_type>::value,
+	    "underlying type must be unsigned");
+
+	struct _blocks {
+		_block_type* p;
+		std::size_t cap;
+	};
+
+	constexpr static auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
+	constexpr static auto _bits_per_block =
+		std::numeric_limits<_block_type>::digits;
+
+	typedef std::bitset<_bits_internal> _bits;
+	static_assert(sizeof(_bits) == sizeof(_blocks),
+	    "bitset is larger than expected");
+
+private:
+	typename std::aligned_storage<sizeof(_bits), alignof(_bits)>::type st_;
+	boost::compressed_pair<std::size_t, allocator_type> sz_alloc_;
 };
 
 typedef basic_bitvector<std::allocator<unsigned long>> bitvector;

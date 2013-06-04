@@ -4,4 +4,5 @@
 int main()
 {
 	stdex::bitvector v;
+	std::cout << sizeof(v) << std::endl;
 }
