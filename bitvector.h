@@ -92,7 +92,7 @@ public:
 		if (hmax / _bits_per_block <= amax)
 			return hmax;
 		else
-			return amax * CHAR_BIT;
+			return count_to_bits(amax);
 	}
 
 	void swap(basic_bitvector& v) noexcept(
@@ -116,11 +116,16 @@ private:
 		if (_still_short())
 			return _bits_internal;
 		else
-			return st_.blocks.cap * CHAR_BIT;
+			return count_to_bits(st_.blocks.cap);
 	}
 
 #undef _size
 #undef _alloc
+
+	static std::size_t count_to_bits(std::size_t n)
+	{
+		return n * _bits_per_block;
+	}
 
 	union _ut {
 		_blocks blocks;
