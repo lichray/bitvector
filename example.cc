@@ -13,6 +13,5 @@ int main()
 		    stdex::bitvector>::value << std::endl
 		<< "nothrow swap:\t\t" << noexcept(swap(v, v)) << std::endl
 		<< "default init size:\t" << v.size() << std::endl
-		<< "default init capacity:\t" << v.capacity() << std::endl
 		;
 }

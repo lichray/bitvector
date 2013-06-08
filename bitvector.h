@@ -95,14 +95,6 @@ public:
 			return amax * CHAR_BIT;
 	}
 
-	std::size_t capacity() const noexcept
-	{
-		if (_still_short())
-			return _bits_internal;
-		else
-			return st_.blocks.cap * CHAR_BIT;
-	}
-
 	void swap(basic_bitvector& v) noexcept(
 	    is_nothrow_swappable<allocator_type>::value)
 	{
@@ -119,6 +111,14 @@ private:
 		return _size <= _bits_internal;
 	}
 
+	std::size_t capacity() const
+	{
+		if (_still_short())
+			return _bits_internal;
+		else
+			return st_.blocks.cap * CHAR_BIT;
+	}
+
 #undef _size
 #undef _alloc
 
@@ -126,7 +126,7 @@ private:
 		_blocks blocks;
 		_bits bits;
 
-		_ut() {}
+		_ut() : bits() {}
 	} st_;
 	boost::compressed_pair<std::size_t, allocator_type> sz_alloc_;
 };
