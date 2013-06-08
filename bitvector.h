@@ -61,8 +61,11 @@ private:
 
 public:
 
-#define _size	sz_alloc_.first()
-#define _alloc	sz_alloc_.second()
+#define size_	sz_alloc_.first()
+#define alloc_	sz_alloc_.second()
+#define cap_	st_.blocks.cap
+#define p_	st_.blocks.p
+#define bits_	st_.bits
 
 	basic_bitvector() noexcept(
 	    std::is_nothrow_default_constructible<allocator_type>::value) :
@@ -75,17 +78,17 @@ public:
 
 	bool empty() const noexcept
 	{
-		return _size == 0;
+		return size_ == 0;
 	}
 
 	std::size_t size() const noexcept
 	{
-		return _size;
+		return size_;
 	}
 
 	std::size_t max_size() const noexcept
 	{
-		auto amax = _alloc_traits::max_size(_alloc);
+		auto amax = _alloc_traits::max_size(alloc_);
 		auto hmax = std::numeric_limits<
 		    typename _alloc_traits::difference_type>::max();
 
@@ -100,15 +103,15 @@ public:
 	{
 		using std::swap;
 
-		swap(_alloc, v._alloc);
-		swap(_size, v._size);
+		swap(alloc_, v.alloc_);
+		swap(size_, v.size_);
 		swap(st_, v.st_);
 	}
 
 private:
 	bool _still_short() const
 	{
-		return _size <= _bits_internal;
+		return size_ <= _bits_internal;
 	}
 
 	std::size_t capacity() const
@@ -116,11 +119,14 @@ private:
 		if (_still_short())
 			return _bits_internal;
 		else
-			return count_to_bits(st_.blocks.cap);
+			return count_to_bits(cap_);
 	}
 
-#undef _size
-#undef _alloc
+#undef size_
+#undef alloc_
+#undef cap_
+#undef p_
+#undef bits_
 
 	static std::size_t count_to_bits(std::size_t n)
 	{
