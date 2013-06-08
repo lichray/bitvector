@@ -8,10 +8,11 @@ int main()
 	std::cout << std::boolalpha
 		<< "sizeof:\t\t\t" << sizeof(v) << std::endl
 		<< "max_size:\t\t" << v.max_size() << std::endl
-		<< "default ctor nothrow:\t"
+		<< "nothrow default ctor:\t"
 		<< std::is_nothrow_default_constructible<
 		    stdex::bitvector>::value << std::endl
-		<< "default ctor size:\t" << v.size() << std::endl
-		<< "default ctor capacity:\t" << v.capacity() << std::endl
+		<< "nothrow swap:\t\t" << noexcept(swap(v, v)) << std::endl
+		<< "default init size:\t" << v.size() << std::endl
+		<< "default init capacity:\t" << v.capacity() << std::endl
 		;
 }

@@ -26,6 +26,7 @@
 #ifndef _BITVECTOR_H
 #define _BITVECTOR_H 1
 
+#include "utility.h"
 #include <memory>
 #include <limits>
 #include <climits>
@@ -68,6 +69,10 @@ public:
 		sz_alloc_(0)
 	{}
 
+	explicit basic_bitvector(allocator_type const& a) :
+		sz_alloc_(0, a)
+	{}
+
 	bool empty() const noexcept
 	{
 		return _size == 0;
@@ -98,6 +103,15 @@ public:
 			return st_.blocks.cap * CHAR_BIT;
 	}
 
+	void swap(basic_bitvector& v) noexcept(
+	    is_nothrow_swappable<allocator_type>::value)
+	{
+		using std::swap;
+
+		swap(_alloc, v._alloc);
+		swap(_size, v._size);
+		swap(st_, v.st_);
+	}
 
 private:
 	bool _still_short() const
@@ -116,6 +130,13 @@ private:
 	} st_;
 	boost::compressed_pair<std::size_t, allocator_type> sz_alloc_;
 };
+
+template <typename Allocator>
+void swap(basic_bitvector<Allocator>& a, basic_bitvector<Allocator>& b)
+	noexcept(noexcept(a.swap(b)))
+{
+	a.swap(b);
+}
 
 typedef basic_bitvector<std::allocator<unsigned long>> bitvector;
 
