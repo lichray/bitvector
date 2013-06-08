@@ -58,8 +58,17 @@ private:
 	static_assert(sizeof(_bits) == sizeof(_blocks),
 	    "bitset is larger than expected");
 
+public:
+	basic_bitvector() : sz_alloc_(0)
+	{}
+
 private:
-	typename std::aligned_storage<sizeof(_bits), alignof(_bits)>::type st_;
+	union _ut {
+		_blocks blocks;
+		_bits bits;
+
+		_ut() {}
+	} st_;
 	boost::compressed_pair<std::size_t, allocator_type> sz_alloc_;
 };
 
