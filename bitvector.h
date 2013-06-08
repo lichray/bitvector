@@ -59,8 +59,22 @@ private:
 	    "bitset is larger than expected");
 
 public:
-	basic_bitvector() : sz_alloc_(0)
+
+#define _size	sz_alloc_.first()
+#define _alloc	sz_alloc_.second()
+
+	basic_bitvector() noexcept(
+	    std::is_nothrow_default_constructible<allocator_type>::value) :
+		sz_alloc_(0)
 	{}
+
+	std::size_t size() const noexcept
+	{
+		return _size;
+	}
+
+#undef _size
+#undef _alloc
 
 private:
 	union _ut {
