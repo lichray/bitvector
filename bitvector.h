@@ -109,14 +109,14 @@ public:
 	}
 
 private:
-	bool _still_short() const
+	bool using_bits() const
 	{
 		return size_ <= _bits_internal;
 	}
 
 	std::size_t capacity() const
 	{
-		if (_still_short())
+		if (using_bits())
 			return _bits_internal;
 		else
 			return count_to_bits(cap_);
