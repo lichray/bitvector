@@ -68,15 +68,46 @@ public:
 		sz_alloc_(0)
 	{}
 
+	bool empty() const noexcept
+	{
+		return _size == 0;
+	}
+
 	std::size_t size() const noexcept
 	{
 		return _size;
 	}
 
+	std::size_t max_size() const noexcept
+	{
+		auto amax = _alloc_traits::max_size(_alloc);
+		auto hmax = std::numeric_limits<
+		    typename _alloc_traits::difference_type>::max();
+
+		if (hmax / _bits_per_block <= amax)
+			return hmax;
+		else
+			return amax * CHAR_BIT;
+	}
+
+	std::size_t capacity() const noexcept
+	{
+		if (_still_short())
+			return _bits_internal;
+		else
+			return st_.blocks.cap * CHAR_BIT;
+	}
+
+
+private:
+	bool _still_short() const
+	{
+		return _size <= _bits_internal;
+	}
+
 #undef _size
 #undef _alloc
 
-private:
 	union _ut {
 		_blocks blocks;
 		_bits bits;
