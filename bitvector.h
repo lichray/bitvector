@@ -96,8 +96,7 @@ public:
 	std::size_t max_size() const noexcept
 	{
 		auto amax = _alloc_traits::max_size(alloc_);
-		auto hmax = std::numeric_limits<
-		    typename _alloc_traits::difference_type>::max();
+		auto hmax = std::numeric_limits<std::size_t>::max();
 
 		if (hmax / _bits_per_block <= amax)
 			return hmax;
