@@ -43,7 +43,7 @@ struct basic_bitvector
 private:
 	typedef std::allocator_traits<allocator_type> _alloc_traits;
 	typedef typename _alloc_traits::value_type _block_type;
-	static_assert(std::is_unsigned<_block_type>::value,
+	static_assert(std::is_unsigned<_block_type>(),
 	    "underlying type must be unsigned");
 
 	struct _blocks {
@@ -68,7 +68,7 @@ public:
 #define bits_	st_.bits
 
 	basic_bitvector() noexcept(
-	    std::is_nothrow_default_constructible<allocator_type>::value) :
+	    std::is_nothrow_default_constructible<allocator_type>()) :
 		sz_alloc_(0)
 	{}
 
@@ -99,7 +99,7 @@ public:
 	}
 
 	void swap(basic_bitvector& v) noexcept(
-	    is_nothrow_swappable<allocator_type>::value)
+	    is_nothrow_swappable<allocator_type>())
 	{
 		using std::swap;
 
