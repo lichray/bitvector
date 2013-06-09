@@ -29,6 +29,7 @@
 #include "utility.h"
 #include "__aux.h"
 #include <climits>
+#include <stdexcept>
 #include <boost/compressed_pair.hpp>
 
 namespace stdex {
