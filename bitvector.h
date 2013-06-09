@@ -28,9 +28,7 @@
 
 #include "utility.h"
 #include "__aux.h"
-#include <memory>
 #include <climits>
-#include <bitset>
 #include <boost/compressed_pair.hpp>
 
 namespace stdex {
@@ -56,9 +54,9 @@ private:
 	constexpr static auto _bits_per_block =
 		std::numeric_limits<_block_type>::digits;
 
-	typedef std::bitset<_bits_internal> _bits;
+	using _bits = _block_type[_bits_internal / _bits_per_block];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
-	    "bitset is larger than expected");
+	    "unsupported pointer size");
 
 public:
 
