@@ -27,8 +27,8 @@
 #define _BITVECTOR_H 1
 
 #include "utility.h"
+#include "__aux.h"
 #include <memory>
-#include <limits>
 #include <climits>
 #include <bitset>
 #include <boost/compressed_pair.hpp>
@@ -41,6 +41,7 @@ struct basic_bitvector
 	typedef Allocator allocator_type;
 
 private:
+	typedef basic_bitvector<allocator_type> _self;
 	typedef std::allocator_traits<allocator_type> _alloc_traits;
 	typedef typename _alloc_traits::value_type _block_type;
 	static_assert(std::is_unsigned<_block_type>(),
@@ -76,6 +77,12 @@ public:
 		sz_alloc_(0, a)
 	{}
 
+	~basic_bitvector() noexcept
+	{
+		if (not using_bits() and p_ != nullptr)
+			deallocate();
+	}
+
 	bool empty() const noexcept
 	{
 		return size_ == 0;
@@ -96,6 +103,12 @@ public:
 			return hmax;
 		else
 			return count_to_bits(amax);
+	}
+
+	void push_back(bool b)
+	{
+		expand_to_hold(size_ + 1);
+		++size_;
 	}
 
 	void swap(basic_bitvector& v) noexcept(
@@ -122,6 +135,31 @@ private:
 			return count_to_bits(cap_);
 	}
 
+	void expand_to_hold(std::size_t sz)
+	{
+		if (sz > capacity()) {
+			if (sz > max_size())
+				throw std::length_error("bitvector");
+
+			_self v(alloc_);
+			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
+			// fake copying
+			v.size_ = size_;
+			swap(v);
+		}
+	}
+
+	void allocate(std::size_t n)
+	{
+		p_ = _alloc_traits::allocate(alloc_, n);
+		cap_ = n;
+	}
+
+	void deallocate()
+	{
+		_alloc_traits::deallocate(alloc_, p_, cap_);
+	}
+
 #undef size_
 #undef alloc_
 #undef cap_
@@ -131,6 +169,11 @@ private:
 	static std::size_t count_to_bits(std::size_t n)
 	{
 		return n * _bits_per_block;
+	}
+
+	static std::size_t bits_to_count(std::size_t n)
+	{
+		return (n + (_bits_per_block - 1)) / _bits_per_block;
 	}
 
 	union _ut {
