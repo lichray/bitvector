@@ -78,7 +78,7 @@ public:
 
 	~basic_bitvector() noexcept
 	{
-		if (not using_bits() and p_ != nullptr)
+		if (not using_bits())
 			deallocate();
 	}
 
