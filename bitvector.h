@@ -174,6 +174,21 @@ private:
 		return (n + (_bits_per_block - 1)) / _bits_per_block;
 	}
 
+	static std::size_t block_index(std::size_t n)
+	{
+		return n / _bits_per_block;
+	}
+
+	static std::size_t bit_index(std::size_t n)
+	{
+		return n % _bits_per_block;
+	}
+
+	static _block_type bit_mask(std::size_t n)
+	{
+		return _block_type(1) << bit_index(n);
+	}
+
 	union _ut {
 		_blocks blocks;
 		_bits bits;
