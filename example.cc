@@ -23,4 +23,6 @@ int main()
 	std::cout
 		<< "size after insertion:\t" << v.size() << std::endl
 		;
+
+	v.set(128, false);
 }

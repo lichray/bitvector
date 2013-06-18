@@ -65,6 +65,7 @@ public:
 #define cap_	st_.blocks.cap
 #define p_	st_.blocks.p
 #define bits_	st_.bits
+#define vec_	(using_bits() ? bits_ : p_)
 
 	basic_bitvector() noexcept(
 	    std::is_nothrow_default_constructible<allocator_type>()) :
@@ -102,10 +103,20 @@ public:
 			return count_to_bits(amax);
 	}
 
-	void push_back(bool b)
+	basic_bitvector& set(std::size_t pos, bool value = true)
+	{
+		if (pos >= size_)
+			throw std::out_of_range("basic_bitvector::set");
+
+		set_bit_to(pos, value);
+		return *this;
+	}
+
+	void push_back(bool value)
 	{
 		expand_to_hold(size_ + 1);
 		++size_;
+		set_bit_to(size_ - 1, value);
 	}
 
 	void swap(basic_bitvector& v) noexcept(
@@ -119,6 +130,24 @@ public:
 	}
 
 private:
+	void set_bit_to(std::size_t pos, bool value)
+	{
+		if (value)
+			set_bit(pos);
+		else
+			unset_bit(pos);
+	}
+
+	void set_bit(std::size_t pos)
+	{
+		vec_[block_index(pos)] |= bit_mask(pos);
+	}
+
+	void unset_bit(std::size_t pos)
+	{
+		vec_[block_index(pos)] &= ~bit_mask(pos);
+	}
+
 	bool using_bits() const
 	{
 		return size_ <= _bits_internal;
@@ -162,6 +191,7 @@ private:
 #undef cap_
 #undef p_
 #undef bits_
+#undef vec_
 
 	static std::size_t count_to_bits(std::size_t n)
 	{
