@@ -40,7 +40,6 @@ struct basic_bitvector
 	typedef Allocator allocator_type;
 
 private:
-	typedef basic_bitvector<allocator_type> _self;
 	typedef std::allocator_traits<allocator_type> _alloc_traits;
 	typedef typename _alloc_traits::value_type _block_type;
 	static_assert(std::is_unsigned<_block_type>(),
@@ -139,7 +138,7 @@ private:
 			if (sz > max_size())
 				throw std::length_error("bitvector");
 
-			_self v(alloc_);
+			basic_bitvector v(alloc_);
 			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
 			// fake copying
 			v.size_ = size_;
