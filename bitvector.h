@@ -30,6 +30,7 @@
 #include "__aux.h"
 #include <climits>
 #include <stdexcept>
+#include <algorithm>
 #include <boost/compressed_pair.hpp>
 
 namespace stdex {
@@ -169,7 +170,12 @@ private:
 
 			basic_bitvector v(alloc_);
 			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
-			// fake copying
+
+			auto vp = (sz <= _bits_internal) ? v.bits_ : v.p_;
+			auto n = bits_to_count(size_);
+
+			std::copy_n(vec_, n, vp);
+			std::fill_n(vp + n, v.cap_ - n, _block_type(0));
 			v.size_ = size_;
 			swap(v);
 		}
