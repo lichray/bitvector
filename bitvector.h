@@ -31,7 +31,6 @@
 #include <climits>
 #include <stdexcept>
 #include <algorithm>
-#include <boost/compressed_pair.hpp>
 
 namespace stdex {
 
@@ -235,7 +234,7 @@ private:
 
 		_ut() : bits() {}
 	} st_;
-	boost::compressed_pair<std::size_t, allocator_type> sz_alloc_;
+	compressed_pair<std::size_t, allocator_type> sz_alloc_;
 };
 
 template <typename Allocator>
