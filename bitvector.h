@@ -51,9 +51,20 @@ private:
 		std::size_t cap;
 	};
 
+	constexpr static std::size_t bit_index(std::size_t n)
+	{
+		return n % _bits_per_block;
+	}
+
+	constexpr static _block_type bit_mask(std::size_t n)
+	{
+		return _block_type(1) << bit_index(n);
+	}
+
 	constexpr static auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
 	constexpr static auto _bits_per_block =
 		std::numeric_limits<_block_type>::digits;
+	constexpr static auto _bits_in_use = bit_mask(_bits_per_block - 1);
 
 	using _bits = _block_type[_bits_internal / _bits_per_block];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
@@ -70,11 +81,11 @@ public:
 
 	basic_bitvector() noexcept(
 	    std::is_nothrow_default_constructible<allocator_type>()) :
-		sz_alloc_(0)
+		sz_alloc_(_bits_in_use)
 	{}
 
 	explicit basic_bitvector(allocator_type const& a) :
-		sz_alloc_(0, a)
+		sz_alloc_(_bits_in_use, a)
 	{}
 
 	~basic_bitvector() noexcept
@@ -85,12 +96,12 @@ public:
 
 	bool empty() const noexcept
 	{
-		return size_ == 0;
+		return size() == 0;
 	}
 
 	std::size_t size() const noexcept
 	{
-		return size_;
+		return size_ & ~_bits_in_use;
 	}
 
 	std::size_t max_size() const noexcept
@@ -106,7 +117,7 @@ public:
 
 	basic_bitvector& set(std::size_t pos, bool value = true)
 	{
-		if (pos >= size_)
+		if (pos >= size())
 			throw std::out_of_range("basic_bitvector::set");
 
 		set_bit_to(pos, value);
@@ -115,9 +126,9 @@ public:
 
 	void push_back(bool value)
 	{
-		expand_to_hold(size_ + 1);
+		expand_to_hold(size() + 1);
+		set_bit_to(size(), value);
 		++size_;
-		set_bit_to(size_ - 1, value);
 	}
 
 	void swap(basic_bitvector& v) noexcept(
@@ -151,7 +162,7 @@ private:
 
 	bool using_bits() const
 	{
-		return size_ <= _bits_internal;
+		return size_ & _bits_in_use;
 	}
 
 	std::size_t capacity() const
@@ -170,13 +181,12 @@ private:
 
 			basic_bitvector v(alloc_);
 			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
+			v.size_ = size();
 
-			auto vp = (sz <= _bits_internal) ? v.bits_ : v.p_;
-			auto n = bits_to_count(size_);
+			auto n = bits_to_count(v.size_);
 
-			std::copy_n(vec_, n, vp);
-			std::fill_n(vp + n, v.cap_ - n, _block_type(0));
-			v.size_ = size_;
+			std::copy_n(vec_, n, v.p_);
+			std::fill_n(v.p_ + n, v.cap_ - n, _block_type(0));
 			swap(v);
 		}
 	}
@@ -212,16 +222,6 @@ private:
 	static std::size_t block_index(std::size_t n)
 	{
 		return n / _bits_per_block;
-	}
-
-	static std::size_t bit_index(std::size_t n)
-	{
-		return n % _bits_per_block;
-	}
-
-	static _block_type bit_mask(std::size_t n)
-	{
-		return _block_type(1) << bit_index(n);
 	}
 
 	union _ut {
