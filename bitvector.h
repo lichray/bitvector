@@ -239,7 +239,7 @@ private:
 };
 
 template <typename Allocator>
-void swap(basic_bitvector<Allocator>& a, basic_bitvector<Allocator>& b)
+inline void swap(basic_bitvector<Allocator>& a, basic_bitvector<Allocator>& b)
 	noexcept(noexcept(a.swap(b)))
 {
 	a.swap(b);
