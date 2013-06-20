@@ -27,6 +27,7 @@
 #define _UTILITY_H 1
 
 #include <utility>
+#include <tuple>
 
 namespace stdex {
 
@@ -38,6 +39,57 @@ struct is_nothrow_swappable :
 	std::integral_constant<bool,
 	noexcept(swap(std::declval<T&>(), std::declval<T&>()))>
 {};
+
+template <typename T1, typename T2>
+struct compressed_pair : std::tuple<T1, T2>
+{
+	typedef T1 first_type;
+	typedef T2 second_type;
+
+private:
+	typedef std::tuple<T1, T2> _base;
+
+public:
+	constexpr compressed_pair() noexcept(
+	    std::is_nothrow_default_constructible<_base>())
+	{}
+
+	constexpr explicit compressed_pair(first_type x) :
+		_base(std::move(x), {})
+	{}
+
+	constexpr explicit compressed_pair(second_type y) :
+		_base({}, std::move(y))
+	{}
+
+	constexpr compressed_pair(first_type x, second_type y) :
+		_base(std::move(x), std::move(y))
+	{}
+
+	/* c++14 */ auto first() noexcept
+		-> first_type&
+	{
+		return std::get<0>(*this);
+	}
+
+	constexpr auto first() const noexcept
+		-> first_type const&
+	{
+		return std::get<0>(*this);
+	}
+
+	/* c++14 */ auto second() noexcept
+		-> second_type&
+	{
+		return std::get<1>(*this);
+	}
+
+	constexpr auto second() const noexcept
+		-> second_type const&
+	{
+		return std::get<1>(*this);
+	}
+};
 
 }
 
