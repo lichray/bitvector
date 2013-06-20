@@ -101,13 +101,13 @@ public:
 
 	std::size_t size() const noexcept
 	{
-		return size_ & ~_bits_in_use;
+		return actual_size(size_);
 	}
 
 	std::size_t max_size() const noexcept
 	{
 		auto amax = _alloc_traits::max_size(alloc_);
-		auto hmax = std::numeric_limits<std::size_t>::max();
+		auto hmax = actual_size(std::numeric_limits<std::size_t>::max());
 
 		if (hmax / _bits_per_block <= amax)
 			return hmax;
@@ -222,6 +222,11 @@ private:
 	static std::size_t block_index(std::size_t n)
 	{
 		return n / _bits_per_block;
+	}
+
+	static std::size_t actual_size(std::size_t n)
+	{
+		return n & ~_bits_in_use;
 	}
 
 	union _ut {
