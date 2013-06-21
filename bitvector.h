@@ -45,7 +45,8 @@ private:
 	static_assert(std::is_unsigned<_block_type>(),
 	    "underlying type must be unsigned");
 
-	struct _blocks {
+	struct _blocks
+	{
 		_block_type* p;
 		std::size_t cap;
 	};
@@ -67,7 +68,7 @@ private:
 
 	using _bits = _block_type[_bits_internal / _bits_per_block];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
-	    "unsupported pointer size");
+	    "unsupported representation");
 
 public:
 
@@ -106,7 +107,8 @@ public:
 	std::size_t max_size() const noexcept
 	{
 		auto amax = _alloc_traits::max_size(alloc_);
-		auto hmax = actual_size(std::numeric_limits<std::size_t>::max());
+		auto hmax = actual_size(std::numeric_limits<
+		    std::size_t>::max());
 
 		if (hmax / _bits_per_block <= amax)
 			return hmax;
@@ -228,7 +230,8 @@ private:
 		return n & ~_bits_in_use;
 	}
 
-	union _ut {
+	union _ut
+	{
 		_blocks blocks;
 		_bits bits;
 
