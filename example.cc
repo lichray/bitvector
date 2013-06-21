@@ -27,13 +27,16 @@ int main()
 		<< "last bit:\t\t" << v.test(128) << std::endl
 		;
 
-	auto b = v.set(128, false)[128];
+	v.set(128, false);
+	std::cout << "after set to false:\t" << v[128] << std::endl;
 
-	std::cout
-		<< "after set to false:\t" << b << std::endl
-		;
+	v.flip(128);
+	std::cout << "after flipped:\t\t" << v[128] << std::endl;
 
-	auto r = (v[128] = b);
+	v.reset(128);
+	std::cout << "after reset:\t\t" << v[128] << std::endl;
+
+	auto r = v[128];
 	r.flip();
 
 	std::cout

@@ -191,6 +191,24 @@ public:
 		return *this;
 	}
 
+	basic_bitvector& reset(std::size_t pos)
+	{
+		if (pos >= size())
+			throw std::out_of_range("basic_bitvector::reset");
+
+		unset_bit(pos);
+		return *this;
+	}
+
+	basic_bitvector& flip(std::size_t pos)
+	{
+		if (pos >= size())
+			throw std::out_of_range("basic_bitvector::flip");
+
+		flip_bit(pos);
+		return *this;
+	}
+
 	void push_back(bool value)
 	{
 		expand_to_hold(size() + 1);
@@ -225,6 +243,11 @@ private:
 	void unset_bit(std::size_t pos)
 	{
 		vec_[block_index(pos)] &= ~bit_mask(pos);
+	}
+
+	void flip_bit(std::size_t pos)
+	{
+		vec_[block_index(pos)] ^= bit_mask(pos);
 	}
 
 	bool using_bits() const
