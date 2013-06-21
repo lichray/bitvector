@@ -17,12 +17,28 @@ int main()
 		<< "default init size:\t" << v.size() << std::endl
 		;
 
+	std::cout << std::noboolalpha;
+
 	for (int i = 0; i < 129; ++i)
 		v.push_back(true);
 
 	std::cout
 		<< "size after insertion:\t" << v.size() << std::endl
+		<< "last bit:\t\t" << v.test(128) << std::endl
 		;
 
-	v.set(128, false);
+	auto b = v.set(128, false)[128];
+
+	std::cout
+		<< "after set to false:\t" << b << std::endl
+		;
+
+	auto r = (v[128] = b);
+	r.flip();
+
+	std::cout
+		<< "after proxy flipped:\t" << v[128] << std::endl
+		<< "proxy:\t\t\t" << r << std::endl
+		<< "proxy inversed:\t\t" << ~r << std::endl
+		;
 }

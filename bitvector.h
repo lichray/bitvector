@@ -72,6 +72,54 @@ private:
 
 public:
 
+	struct reference
+	{
+	private:
+		typedef typename basic_bitvector::_block_type& _bref_t;
+		friend basic_bitvector;
+
+		reference(_bref_t loc, std::size_t mask) :
+			loc_(loc),
+			mask_(mask)
+		{}
+
+	public:
+		reference& operator=(bool value) noexcept
+		{
+			if (value)
+				loc_ |= mask_;
+			else
+				loc_ &= ~mask_;
+
+			return *this;
+		}
+
+		reference& operator=(reference other) noexcept
+		{
+			return (*this) = static_cast<bool>(other);
+		}
+
+		operator bool() const noexcept
+		{
+			return loc_ & mask_;
+		}
+
+		bool operator~() const noexcept
+		{
+			return !(*this);
+		}
+
+		reference& flip() noexcept
+		{
+			loc_ ^= mask_;
+			return *this;
+		}
+
+	private:
+		_bref_t loc_;
+		std::size_t mask_;
+	};
+
 #define size_	sz_alloc_.first()
 #define alloc_	sz_alloc_.second()
 #define cap_	st_.blocks.cap
@@ -92,6 +140,24 @@ public:
 	{
 		if (not using_bits())
 			deallocate();
+	}
+
+	reference operator[](std::size_t pos)
+	{
+		return { vec_[block_index(pos)], bit_mask(pos) };
+	}
+
+	bool operator[](std::size_t pos) const
+	{
+		return vec_[block_index(pos)] & bit_mask(pos);
+	}
+
+	bool test(std::size_t pos) const
+	{
+		if (pos >= size())
+			throw std::out_of_range("basic_bitvector::test");
+
+		return (*this)[pos];
 	}
 
 	bool empty() const noexcept
