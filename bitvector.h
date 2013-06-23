@@ -51,20 +51,20 @@ private:
 		std::size_t cap;
 	};
 
-	constexpr static std::size_t bit_index(std::size_t n)
+	static constexpr std::size_t bit_index(std::size_t n)
 	{
 		return n % _bits_per_block;
 	}
 
-	constexpr static _block_type bit_mask(std::size_t n)
+	static constexpr _block_type bit_mask(std::size_t n)
 	{
 		return _block_type(1) << bit_index(n);
 	}
 
-	constexpr static auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
-	constexpr static auto _bits_per_block =
+	static constexpr auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
+	static constexpr auto _bits_per_block =
 		std::numeric_limits<_block_type>::digits;
-	constexpr static auto _bits_in_use = bit_mask(_bits_per_block - 1);
+	static constexpr auto _bits_in_use = bit_mask(_bits_per_block - 1);
 
 	using _bits = _block_type[_bits_internal / _bits_per_block];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
