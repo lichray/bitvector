@@ -26,6 +26,7 @@
 #ifndef ___AUX_H
 #define ___AUX_H 1
 
+#include <climits>
 #include <limits>
 #include <type_traits>
 
@@ -57,6 +58,62 @@ constexpr auto pow2_roundup(Int n) -> R
 {
 	return or_shift<
 	    std::numeric_limits<R>::digits / 2>::apply(R(n) - 1) + 1;
+}
+
+template <int bit>
+struct fill_bits
+{
+	template <typename Int>
+	static constexpr auto apply(Int n) -> Int
+	{
+		return _lambda(fill_bits<bit / 2>::apply(n));
+	}
+
+private:
+	template <typename Int>
+	static constexpr auto _lambda(Int x) -> Int
+	{
+		return (x << (bit / 2)) ^ x;
+	}
+};
+
+template <>
+struct fill_bits<CHAR_BIT>
+{
+	template <typename Int>
+	static constexpr auto apply(Int n) -> Int
+	{
+		return n;
+	}
+};
+
+template <typename Int>
+constexpr auto magic(Int n)
+	-> typename std::enable_if<std::is_unsigned<Int>::value, Int>::type
+{
+	return fill_bits<std::numeric_limits<Int>::digits>::apply(n);
+}
+
+template <typename Int>
+struct m1 : std::integral_constant<Int, magic(Int(0x55))> {};
+
+template <typename Int>
+struct m2 : std::integral_constant<Int, magic(Int(0x33))> {};
+
+template <typename Int>
+struct m4 : std::integral_constant<Int, magic(Int(0x0f))> {};
+
+template <typename Int>
+struct h01 : std::integral_constant<Int, magic(Int(0x01))> {};
+
+template <typename Int>
+/* c++14 */ inline auto popcount(Int x) -> std::size_t
+{
+	x -= (x >> 1) & m1<Int>();
+	x = (x & m2<Int>()) + ((x >> 2) & m2<Int>());
+	x = (x + (x >> 4)) & m4<Int>();
+	return Int(x * h01<Int>()) >>
+	    (std::numeric_limits<Int>::digits - CHAR_BIT);
 }
 
 }
