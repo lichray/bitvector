@@ -44,4 +44,10 @@ int main()
 		<< "proxy:\t\t\t" << r << std::endl
 		<< "proxy inversed:\t\t" << ~r << std::endl
 		;
+
+	v[127].flip();
+
+	std::cout
+		<< "popcount after a flip:\t" << v.count() << std::endl
+		;
 }

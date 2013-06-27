@@ -31,6 +31,7 @@
 #include <climits>
 #include <stdexcept>
 #include <algorithm>
+#include <numeric>
 
 namespace stdex {
 
@@ -160,6 +161,17 @@ public:
 		return (*this)[pos];
 	}
 
+	std::size_t count() const noexcept
+	{
+		return std::accumulate(vec_, vec_ + block_index(size()),
+		    std::size_t(0),
+		    [](std::size_t n, _block_type v)
+		    {
+		    	return n + stdex::aux::popcount(v);
+		    }
+		    ) + stdex::aux::popcount(last_block());
+	}
+
 	bool empty() const noexcept
 	{
 		return size() == 0;
@@ -248,6 +260,13 @@ private:
 	void flip_bit(std::size_t pos)
 	{
 		vec_[block_index(pos)] ^= bit_mask(pos);
+	}
+
+	_block_type last_block() const
+	{
+		return vec_[block_index(size())] &
+			(~_block_type(0) >>
+			 (_bits_per_block - bit_index(size())));
 	}
 
 	bool using_bits() const
