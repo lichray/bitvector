@@ -52,4 +52,11 @@ int main()
 		<< "popcount after a flip:\t" << v.count() << std::endl
 		<< "popcount of copied:\t" << v2.count() << std::endl
 		;
+
+	stdex::bitvector v3;
+	v = v3;
+
+	std::cout
+		<< "popcount after assign:\t" << v.count() << std::endl
+		;
 }

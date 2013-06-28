@@ -160,6 +160,13 @@ public:
 		}
 	}
 
+	// WIP: N2525
+	basic_bitvector& operator=(basic_bitvector v)
+	{
+		swap(v);
+		return *this;
+	}
+
 	~basic_bitvector() noexcept
 	{
 		if (not using_bits())
