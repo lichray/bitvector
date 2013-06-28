@@ -59,4 +59,10 @@ int main()
 	std::cout
 		<< "popcount after assign:\t" << v.count() << std::endl
 		;
+
+	v = std::move(v2);
+
+	std::cout
+		<< "after moved back:\t" << v.count() << std::endl
+		;
 }
