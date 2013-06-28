@@ -46,8 +46,10 @@ int main()
 		;
 
 	v[127].flip();
+	stdex::bitvector v2(v);
 
 	std::cout
 		<< "popcount after a flip:\t" << v.count() << std::endl
+		<< "popcount of copied:\t" << v2.count() << std::endl
 		;
 }

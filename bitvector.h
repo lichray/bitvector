@@ -137,6 +137,29 @@ public:
 		sz_alloc_(_bits_in_use, a)
 	{}
 
+	basic_bitvector(basic_bitvector const& v) :
+		sz_alloc_(v.size_, _alloc_traits::
+		    select_on_container_copy_construction(v.alloc_))
+	{
+		// internal -> internal
+		if (v.using_bits())
+			st_ = v.st_;
+
+		// heap -> internal
+		else if (v.size() <= _bits_internal)
+		{
+			std::copy_n(v.p_, sizeof(bits_), bits_);
+			size_ ^= _bits_in_use;
+		}
+
+		// heap -> shrunk heap
+		else
+		{
+			allocate(aux::pow2_roundup(bits_to_count(v.size_)));
+			copy_to_heap(v);
+		}
+	}
+
 	~basic_bitvector() noexcept
 	{
 		if (not using_bits())
@@ -291,13 +314,17 @@ private:
 			basic_bitvector v(alloc_);
 			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
 			v.size_ = size();
-
-			auto n = bits_to_count(v.size_);
-
-			std::copy_n(vec_, n, v.p_);
-			std::fill_n(v.p_ + n, v.cap_ - n, _block_type(0));
+			v.copy_to_heap(*this);
 			swap(v);
 		}
+	}
+
+	void copy_to_heap(basic_bitvector const& v)
+	{
+		auto n = bits_to_count(size_);
+
+		std::copy_n(v.using_bits() ? v.bits_ : v.p_, n, p_);
+		std::fill_n(p_ + n, cap_ - n, _block_type(0));
 	}
 
 	void allocate(std::size_t n)
