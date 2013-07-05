@@ -46,6 +46,9 @@ private:
 	static_assert(std::is_unsigned<_block_type>(),
 	    "underlying type must be unsigned");
 
+	typedef _block_type* _block_iterator;
+	typedef _block_type const* _block_const_iterator;
+
 	struct _blocks
 	{
 		_block_type* p;
@@ -202,7 +205,7 @@ public:
 
 	std::size_t count() const noexcept
 	{
-		auto n = std::accumulate(vec_, vec_ + block_index(size()),
+		auto n = std::accumulate(begin(), filled_end(),
 		    std::size_t(0),
 		    [](std::size_t n, _block_type v)
 		    {
@@ -348,8 +351,18 @@ private:
 	{
 		auto n = bits_to_count(size_);
 
-		std::copy_n(v.using_bits() ? v.bits_ : v.p_, n, p_);
+		std::copy_n(v.begin(), n, p_);
 		std::fill_n(p_ + n, cap_ - n, _block_type(0));
+	}
+
+	_block_const_iterator begin() const
+	{
+		return vec_;
+	}
+
+	_block_const_iterator filled_end() const
+	{
+		return vec_ + block_index(size());
 	}
 
 	void allocate(std::size_t n)
