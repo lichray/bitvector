@@ -65,4 +65,14 @@ int main()
 	std::cout
 		<< "after moved back:\t" << v.count() << std::endl
 		;
+
+	std::cout << std::boolalpha;
+
+	for (int i = 0; i < 128; ++i)
+		v.reset(i);
+
+	std::cout << "any with last bit set:\t" << v.any() << std::endl;
+
+	v.reset(128);
+	std::cout << "any with no bit set:\t" << v.any() << std::endl;
 }

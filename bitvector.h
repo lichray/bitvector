@@ -203,6 +203,25 @@ public:
 		return (*this)[pos];
 	}
 
+	bool any() const noexcept
+	{
+		bool r = std::any_of(begin(), filled_end(),
+		    [](_block_type v) -> bool
+		    {
+		    	return v;
+		    });
+
+		if (r)
+			return true;
+		else
+			return has_incomplete_block() and last_block();
+	}
+
+	bool none() const noexcept
+	{
+		return not any();
+	}
+
 	std::size_t count() const noexcept
 	{
 		auto n = std::accumulate(begin(), filled_end(),
