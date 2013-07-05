@@ -214,7 +214,7 @@ public:
 		if (r)
 			return true;
 		else
-			return has_incomplete_block() and last_block();
+			return has_incomplete_block() and zeroed_last_block();
 	}
 
 	bool none() const noexcept
@@ -232,7 +232,7 @@ public:
 		    });
 
 		if (has_incomplete_block())
-			return n + stdex::aux::popcount(last_block());
+			return n + stdex::aux::popcount(zeroed_last_block());
 		else
 			return n;
 	}
@@ -332,11 +332,19 @@ private:
 		return bit_index(size()) != 0;
 	}
 
-	_block_type last_block() const
+	_block_type zeroed_last_block() const
 	{
-		return vec_[block_index(size())] &
-			(~_block_type(0) >>
-			 (_bits_per_block - bit_index(size())));
+		return vec_[block_index(size())] & padding_ones();
+	}
+
+	_block_type dezeroed_last_block() const
+	{
+		return ~vec_[block_index(size())] & padding_ones();
+	}
+
+	_block_type padding_ones() const
+	{
+		return ~_block_type(0) >> (_bits_per_block - bit_index(size()));
 	}
 
 	bool using_bits() const
