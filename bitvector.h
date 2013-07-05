@@ -202,13 +202,17 @@ public:
 
 	std::size_t count() const noexcept
 	{
-		return std::accumulate(vec_, vec_ + block_index(size()),
+		auto n = std::accumulate(vec_, vec_ + block_index(size()),
 		    std::size_t(0),
 		    [](std::size_t n, _block_type v)
 		    {
 		    	return n + stdex::aux::popcount(v);
-		    }
-		    ) + stdex::aux::popcount(last_block());
+		    });
+
+		if (has_incomplete_block())
+			return n + stdex::aux::popcount(last_block());
+		else
+			return n;
 	}
 
 	bool empty() const noexcept
@@ -299,6 +303,11 @@ private:
 	void flip_bit(std::size_t pos)
 	{
 		vec_[block_index(pos)] ^= bit_mask(pos);
+	}
+
+	bool has_incomplete_block() const
+	{
+		return bit_index(size()) != 0;
 	}
 
 	_block_type last_block() const
