@@ -72,11 +72,12 @@ int main()
 
 	std::cout << "all with one bit unset:\t" << v.all() << std::endl;
 
-	for (int i = 0; i < 128; ++i)
-		v.reset(i);
+	v.reset();
+	std::cout << "any with no bit set:\t" << v.any() << std::endl;
 
+	v.set(128);
 	std::cout << "any with last bit set:\t" << v.any() << std::endl;
 
-	v.reset(128);
-	std::cout << "any with no bit set:\t" << v.any() << std::endl;
+	v.flip();
+	std::cout << "popcount after flip:\t" << v.count() << std::endl;
 }

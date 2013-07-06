@@ -273,6 +273,12 @@ public:
 			return count_to_bits(amax);
 	}
 
+	basic_bitvector& set() noexcept
+	{
+		std::fill(begin(), end(), ~_block_type(0));
+		return *this;
+	}
+
 	basic_bitvector& set(std::size_t pos, bool value = true)
 	{
 		if (pos >= size())
@@ -282,12 +288,30 @@ public:
 		return *this;
 	}
 
+	basic_bitvector& reset() noexcept
+	{
+		std::fill(begin(), end(), _block_type(0));
+		return *this;
+	}
+
 	basic_bitvector& reset(std::size_t pos)
 	{
 		if (pos >= size())
 			throw std::out_of_range("basic_bitvector::reset");
 
 		unset_bit(pos);
+		return *this;
+	}
+
+	basic_bitvector& flip() noexcept
+	{
+		std::transform(begin(), end(),
+		    begin(),
+		    [](_block_type v)
+		    {
+		    	return ~v;
+		    });
+
 		return *this;
 	}
 
@@ -404,6 +428,16 @@ private:
 	_block_const_iterator filled_end() const
 	{
 		return vec_ + block_index(size());
+	}
+
+	_block_iterator begin()
+	{
+		return vec_;
+	}
+
+	_block_iterator end()
+	{
+		return vec_ + bits_to_count(size());
 	}
 
 	void allocate(std::size_t n)
