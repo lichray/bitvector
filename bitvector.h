@@ -203,6 +203,20 @@ public:
 		return (*this)[pos];
 	}
 
+	bool all() const noexcept
+	{
+		bool r = std::none_of(begin(), filled_end(),
+		    [](_block_type v) -> bool
+		    {
+		    	return ~v;
+		    });
+
+		if (!r)
+			return false;
+		else
+			return !has_incomplete_block() or !dezeroed_last_block();
+	}
+
 	bool any() const noexcept
 	{
 		bool r = std::any_of(begin(), filled_end(),

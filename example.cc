@@ -17,10 +17,12 @@ int main()
 		<< "default init size:\t" << v.size() << std::endl
 		;
 
-	std::cout << std::noboolalpha;
-
 	for (int i = 0; i < 129; ++i)
 		v.push_back(true);
+
+	std::cout << "all with all bit set:\t" << v.all() << std::endl;
+
+	std::cout << std::noboolalpha;
 
 	std::cout
 		<< "size after insertion:\t" << v.size() << std::endl
@@ -67,6 +69,8 @@ int main()
 		;
 
 	std::cout << std::boolalpha;
+
+	std::cout << "all with one bit unset:\t" << v.all() << std::endl;
 
 	for (int i = 0; i < 128; ++i)
 		v.reset(i);
