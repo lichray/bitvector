@@ -80,4 +80,20 @@ int main()
 
 	v.flip();
 	std::cout << "popcount after flip:\t" << v.count() << std::endl;
+
+	stdex::basic_bitvector<std::allocator<unsigned char>> v4;
+	std::cout << "ulong of 0b(empty):\t" << v4.to_ulong() << std::endl;
+
+	v4.push_back(1);
+	v4.push_back(1);
+	v4.push_back(0);
+	v4.push_back(0);
+	v4.push_back(1);
+	std::cout << "ulong of 0b10011:\t" << v4.to_ulong() << std::endl;
+
+	v4.push_back(0);
+	v4.push_back(0);
+	v4.push_back(0);
+	v4.push_back(1);
+	std::cout << "ulong of 0b100010011:\t" << v4.to_ulong() << std::endl;
 }

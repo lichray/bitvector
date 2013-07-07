@@ -341,6 +341,22 @@ public:
 		swap(st_, v.st_);
 	}
 
+	unsigned long to_ulong() const
+	{
+		if (size() > std::numeric_limits<unsigned long>::digits)
+			throw std::overflow_error("basic_bitvector::to_ulong");
+
+		return as_integral<unsigned long>();
+	}
+
+	unsigned long long to_ullong() const
+	{
+		if (size() > std::numeric_limits<unsigned long long>::digits)
+			throw std::overflow_error("basic_bitvector::to_ullong");
+
+		return as_integral<unsigned long long>();
+	}
+
 private:
 	void set_bit_to(std::size_t pos, bool value)
 	{
@@ -449,6 +465,40 @@ private:
 	void deallocate()
 	{
 		_alloc_traits::deallocate(alloc_, p_, cap_);
+	}
+
+	template <typename R>
+	R as_integral() const
+	{
+		return as_integral<R>(std::integral_constant<bool,
+		    std::is_convertible<_block_type, R>()
+		    and sizeof(_block_type) >= sizeof(R)>());
+	}
+
+	template <typename R>
+	R as_integral(std::true_type) const
+	{
+		return zeroed_last_block();
+	}
+
+	template <typename R>
+	R as_integral(std::false_type) const
+	{
+		if (begin() == filled_end())
+			return zeroed_last_block();
+
+		auto r =
+		    std::accumulate(begin() + 1, filled_end(),
+		    R(vec_[0]),
+		    [](R r, _block_type v)
+		    {
+			return r ^ (R(v) << _bits_per_block);
+		    });
+
+		if (has_incomplete_block())
+			return r ^ (R(zeroed_last_block()) << _bits_per_block);
+		else
+			return r;
 	}
 
 #undef size_
