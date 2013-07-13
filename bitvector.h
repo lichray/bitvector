@@ -141,6 +141,29 @@ public:
 		sz_alloc_(_bits_in_use, a)
 	{}
 
+	explicit basic_bitvector(std::size_t n,
+	    allocator_type const& a = allocator_type()) :
+		sz_alloc_(_bits_in_use, a)
+	{
+		expand_to_hold(n);
+		size_ ^= n;
+
+		reset();
+	}
+	
+	basic_bitvector(std::size_t n, bool const& value,
+	    allocator_type const& a = allocator_type()) :
+		sz_alloc_(_bits_in_use, a)
+	{
+		expand_to_hold(n);
+		size_ ^= n;
+
+		if (value)
+			set();
+		else
+			reset();
+	}
+
 	basic_bitvector(basic_bitvector const& v) :
 		sz_alloc_(v.size_, _alloc_traits::
 		    select_on_container_copy_construction(v.alloc_))

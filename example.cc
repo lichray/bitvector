@@ -17,8 +17,8 @@ int main()
 		<< "default init size:\t" << v.size() << std::endl
 		;
 
-	for (int i = 0; i < 129; ++i)
-		v.push_back(true);
+	v = stdex::bitvector(128, true);
+	v.push_back(true);
 
 	std::cout << "all with all bit set:\t" << v.all() << std::endl;
 
@@ -55,17 +55,19 @@ int main()
 		<< "popcount of copied:\t" << v2.count() << std::endl
 		;
 
-	stdex::bitvector v3;
-	v = v3;
+	stdex::bitvector v3(200);
+	swap(v, v3);
 
 	std::cout
-		<< "popcount after assign:\t" << v.count() << std::endl
+		<< "size after swap:\t" << v.size() << std::endl
+		<< "size of swapped:\t" << v3.size() << std::endl
+		<< "popcount after swap:\t" << v.count() << std::endl
 		;
 
-	v = std::move(v2);
+	v = v2;
 
 	std::cout
-		<< "after moved back:\t" << v.count() << std::endl
+		<< "after copied back:\t" << v.count() << std::endl
 		;
 
 	std::cout << std::boolalpha;
