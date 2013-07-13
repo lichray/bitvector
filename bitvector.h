@@ -208,13 +208,14 @@ public:
 		bool r = std::none_of(begin(), filled_end(),
 		    [](_block_type v) -> bool
 		    {
-		    	return ~v;
+			return ~v;
 		    });
 
 		if (!r)
 			return false;
 		else
-			return !has_incomplete_block() or !dezeroed_last_block();
+			return not has_incomplete_block()
+				or !dezeroed_last_block();
 	}
 
 	bool any() const noexcept
@@ -222,7 +223,7 @@ public:
 		bool r = std::any_of(begin(), filled_end(),
 		    [](_block_type v) -> bool
 		    {
-		    	return v;
+			return v;
 		    });
 
 		if (r)
@@ -242,7 +243,7 @@ public:
 		    std::size_t(0),
 		    [](std::size_t n, _block_type v)
 		    {
-		    	return n + stdex::aux::popcount(v);
+			return n + stdex::aux::popcount(v);
 		    });
 
 		if (has_incomplete_block())
@@ -309,7 +310,7 @@ public:
 		    begin(),
 		    [](_block_type v)
 		    {
-		    	return ~v;
+			return ~v;
 		    });
 
 		return *this;
