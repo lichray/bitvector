@@ -1,0 +1,6 @@
+*~
+.*.swp
+*.s
+*.o
+*.core
+example
