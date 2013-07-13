@@ -383,7 +383,12 @@ private:
 
 	bool has_incomplete_block() const
 	{
-		return bit_index(size()) != 0;
+		return extra_size() != 0;
+	}
+
+	std::size_t extra_size() const
+	{
+		return bit_index(size());
 	}
 
 	_block_type zeroed_last_block() const
@@ -398,7 +403,7 @@ private:
 
 	_block_type padding_ones() const
 	{
-		return ~_block_type(0) >> (_bits_per_block - bit_index(size()));
+		return ~_block_type(0) >> (_bits_per_block - extra_size());
 	}
 
 	bool using_bits() const
