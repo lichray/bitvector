@@ -33,13 +33,13 @@
 namespace stdex {
 namespace aux {
 
-template <int bit>
+template <int N>
 struct or_shift
 {
 	template <typename Int>
 	static constexpr auto apply(Int n) -> Int
 	{
-		return or_shift<bit / 2>::apply(n | (n >> bit));
+		return or_shift<N / 2>::apply(n | (n >> N));
 	}
 };
 
@@ -60,20 +60,20 @@ constexpr auto pow2_roundup(Int n) -> R
 	    std::numeric_limits<R>::digits / 2>::apply(R(n) - 1) + 1;
 }
 
-template <int bit>
+template <int N>
 struct fill_bits
 {
 	template <typename Int>
 	static constexpr auto apply(Int n) -> Int
 	{
-		return _lambda(fill_bits<bit / 2>::apply(n));
+		return _lambda(fill_bits<N / 2>::apply(n));
 	}
 
 private:
 	template <typename Int>
 	static constexpr auto _lambda(Int x) -> Int
 	{
-		return (x << (bit / 2)) ^ x;
+		return (x << (N / 2)) ^ x;
 	}
 };
 
