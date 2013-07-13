@@ -391,14 +391,19 @@ private:
 		return bit_index(size());
 	}
 
+	_block_type last_block() const
+	{
+		return *filled_end();
+	}
+
 	_block_type zeroed_last_block() const
 	{
-		return vec_[block_index(size())] & padding_ones();
+		return last_block() & padding_ones();
 	}
 
 	_block_type dezeroed_last_block() const
 	{
-		return ~vec_[block_index(size())] & padding_ones();
+		return ~last_block() & padding_ones();
 	}
 
 	_block_type padding_ones() const
