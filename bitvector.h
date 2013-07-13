@@ -32,6 +32,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <numeric>
+#include <string>
 
 namespace stdex {
 
@@ -340,6 +341,32 @@ public:
 		swap(alloc_, v.alloc_);
 		swap(size_, v.size_);
 		swap(st_, v.st_);
+	}
+
+	template <typename charT = char,
+		  typename traits = std::char_traits<charT>,
+		  typename _Allocator = std::allocator<charT>>
+	std::basic_string<charT, traits, _Allocator>
+	to_string(charT zero = charT('0'), charT one = charT('1')) const
+	{
+		std::basic_string<charT, traits, _Allocator> s(size(), zero);
+		auto it = s.begin();
+
+		if (has_incomplete_block())
+		{
+			aux::fill_bit1_upto(extra_size(),
+			    last_block(), it, one);
+			it += extra_size();
+		}
+
+		std::for_each(reverser(filled_end()), reverser(begin()),
+		    [&](_block_type v)
+		    {
+			aux::fill_bit1(v, it, one);
+			it += _bits_per_block;
+		    });
+
+		return s;
 	}
 
 	unsigned long to_ulong() const

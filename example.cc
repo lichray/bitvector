@@ -89,11 +89,13 @@ int main()
 	v4.push_back(0);
 	v4.push_back(0);
 	v4.push_back(1);
-	std::cout << "ulong of 0b10011:\t" << v4.to_ulong() << std::endl;
+	std::cout << "ulong of 0b" << v4.to_string() << ":\t"
+		<< v4.to_ulong() << std::endl;
 
 	v4.push_back(0);
 	v4.push_back(0);
 	v4.push_back(0);
 	v4.push_back(1);
-	std::cout << "ulong of 0b100010011:\t" << v4.to_ulong() << std::endl;
+	std::cout << "ulong of 0b" << v4.to_string() << ":\t"
+		<< v4.to_ulong() << std::endl;
 }
