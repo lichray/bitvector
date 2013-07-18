@@ -349,11 +349,21 @@ public:
 		return *this;
 	}
 
+	void clear() noexcept
+	{
+		size_ &= _bits_in_use;
+	}
+
 	void push_back(bool value)
 	{
 		expand_to_hold(size() + 1);
 		set_bit_to(size(), value);
 		++size_;
+	}
+
+	void pop_back()
+	{
+		--size_;
 	}
 
 	void swap(basic_bitvector& v) noexcept(

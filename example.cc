@@ -64,11 +64,14 @@ int main()
 		<< "popcount after swap:\t" << v.count() << std::endl
 		;
 
-	v = v2;
+	v.pop_back();
+	std::cout << "size after popped:\t" << v.size() << std::endl;
 
-	std::cout
-		<< "after copied back:\t" << v.count() << std::endl
-		;
+	v.clear();
+	std::cout << "size after clearred:\t" << v.size() << std::endl;
+
+	v = v2;
+	std::cout << "popcount after assign:\t" << v.count() << std::endl;
 
 	std::cout << std::boolalpha;
 
