@@ -75,6 +75,9 @@ private:
 	static_assert(sizeof(_bits) == sizeof(_blocks),
 	    "unsupported representation");
 
+	using _zeros = std::integral_constant<_block_type, 0>;
+	using _ones = std::integral_constant<_block_type, ~_zeros()>;
+
 public:
 
 	struct reference
@@ -300,7 +303,7 @@ public:
 
 	basic_bitvector& set() noexcept
 	{
-		std::fill(begin(), end(), ~_block_type(0));
+		std::fill(begin(), end(), _ones());
 		return *this;
 	}
 
@@ -315,7 +318,7 @@ public:
 
 	basic_bitvector& reset() noexcept
 	{
-		std::fill(begin(), end(), _block_type(0));
+		std::fill(begin(), end(), _zeros());
 		return *this;
 	}
 
@@ -469,7 +472,7 @@ private:
 
 	_block_type padding_ones() const
 	{
-		return ~_block_type(0) >> (_bits_per_block - extra_size());
+		return _ones() >> (_bits_per_block - extra_size());
 	}
 
 	bool using_bits() const
@@ -504,7 +507,7 @@ private:
 		auto n = bits_to_count(size_);
 
 		std::copy_n(v.begin(), n, p_);
-		std::fill_n(p_ + n, cap_ - n, _block_type(0));
+		std::fill_n(p_ + n, cap_ - n, _zeros());
 	}
 
 	_block_const_iterator begin() const
