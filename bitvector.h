@@ -462,15 +462,15 @@ private:
 
 	_block_type zeroed_last_block() const
 	{
-		return last_block() & padding_ones();
+		return last_block() & extra_mask();
 	}
 
 	_block_type dezeroed_last_block() const
 	{
-		return ~last_block() & padding_ones();
+		return ~last_block() & extra_mask();
 	}
 
-	_block_type padding_ones() const
+	_block_type extra_mask() const
 	{
 		return _ones() >> (_bits_per_block - extra_size());
 	}
