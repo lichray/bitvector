@@ -209,6 +209,14 @@ public:
 		return *this;
 	}
 
+	void assign(std::size_t n, bool const& value)
+	{
+		expand_to_hold(n);
+		set_size(n);
+
+		assign_to(value);
+	}
+
 	reference operator[](std::size_t pos)
 	{
 		return { vec_[block_index(pos)], bit_mask(pos) };

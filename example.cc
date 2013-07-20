@@ -73,8 +73,11 @@ int main()
 	v.clear();
 	std::cout << "size after cleared:\t" << v.size() << std::endl;
 
-	v = v2;
+	v.assign(64, 1);
 	std::cout << "popcount after assign:\t" << v.count() << std::endl;
+
+	v = v2;
+	std::cout << "after assignment:\t" << v.count() << std::endl;
 
 	std::cout << std::boolalpha;
 
