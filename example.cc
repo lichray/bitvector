@@ -93,6 +93,9 @@ int main()
 	v.flip();
 	std::cout << "popcount after flip:\t" << v.count() << std::endl;
 
+	stdex::bitvector v5(std::move(v3), v2.get_allocator());
+	std::cout << "size of move init'ed:\t" << v5.size() << std::endl;
+
 	stdex::basic_bitvector<std::allocator<unsigned char>> v4;
 	std::cout << "ulong of 0b(empty):\t" << v4.to_ulong() << std::endl;
 

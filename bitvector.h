@@ -201,6 +201,22 @@ public:
 		v.size_ = _bits_in_use;
 	}
 
+	basic_bitvector(basic_bitvector&& v, allocator_type const& a) :
+		sz_alloc_(v.size_, a)
+	{
+		if (alloc_ == v.alloc_ or v.using_bits())
+		{
+			st_ = v.st_;
+			// minimal change to prevent deallocation
+			v.size_ = _bits_in_use;
+		}
+		else
+		{
+			allocate(aux::pow2_roundup(bits_to_count(v.size_)));
+			copy_to_heap(v);
+		}
+	}
+
 	~basic_bitvector() noexcept
 	{
 		if (not using_bits())
@@ -220,6 +236,11 @@ public:
 		set_size(n);
 
 		assign_to(value);
+	}
+
+	allocator_type get_allocator() const noexcept
+	{
+		return alloc_;
 	}
 
 	reference operator[](std::size_t pos)
