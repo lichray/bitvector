@@ -161,10 +161,7 @@ public:
 		expand_to_hold(n);
 		size_ ^= n;
 
-		if (value)
-			set();
-		else
-			reset();
+		assign_to(value);
 	}
 
 	basic_bitvector(basic_bitvector const& v) :
@@ -380,7 +377,7 @@ public:
 				oned_last_block() :
 				zeroed_last_block();
 
-		size_ = (size_ & _bits_in_use) ^ n;
+		set_size(n);
 		if (oldn < newn)
 			std::fill(begin() + oldn, end(),
 			    value ? _ones() : _zeros());
@@ -462,6 +459,14 @@ private:
 		vec_[block_index(pos)] ^= bit_mask(pos);
 	}
 
+	void assign_to(bool value)
+	{
+		if (value)
+			set();
+		else
+			reset();
+	}
+
 	bool has_incomplete_block() const
 	{
 		return extra_size() != 0;
@@ -527,6 +532,11 @@ private:
 			v.copy_to_heap(*this);
 			swap(v);
 		}
+	}
+
+	void set_size(std::size_t sz)
+	{
+		size_ = (size_ & _bits_in_use) ^ sz;
 	}
 
 	void copy_to_heap(basic_bitvector const& v)
