@@ -74,6 +74,7 @@ int main()
 	std::cout << "size after cleared:\t" << v.size() << std::endl;
 
 	v.assign(64, 1);
+	v.shrink_to_fit();
 	std::cout << "popcount after assign:\t" << v.count() << std::endl;
 
 	v = v2;

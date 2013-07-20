@@ -69,9 +69,10 @@ private:
 	static constexpr auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
 	static constexpr auto _bits_per_block =
 		std::numeric_limits<_block_type>::digits;
+	static constexpr auto _blocks_internal = _bits_internal / _bits_per_block;
 	static constexpr auto _bits_in_use = bit_mask(_bits_per_block - 1);
 
-	using _bits = _block_type[_bits_internal / _bits_per_block];
+	using _bits = _block_type[_blocks_internal];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
 	    "unsupported representation");
 
@@ -165,8 +166,12 @@ public:
 	}
 
 	basic_bitvector(basic_bitvector const& v) :
-		sz_alloc_(v.size_, _alloc_traits::
+		basic_bitvector(v, _alloc_traits::
 		    select_on_container_copy_construction(v.alloc_))
+	{}
+
+	basic_bitvector(basic_bitvector const& v, allocator_type const& a) :
+		sz_alloc_(v.size_, a)
 	{
 		// internal -> internal
 		if (v.using_bits())
@@ -175,7 +180,7 @@ public:
 		// heap -> internal
 		else if (v.size() <= _bits_internal)
 		{
-			std::copy_n(v.p_, sizeof(bits_), bits_);
+			std::copy_n(v.p_, _blocks_internal, bits_);
 			size_ ^= _bits_in_use;
 		}
 
@@ -304,6 +309,12 @@ public:
 			return hmax;
 		else
 			return count_to_bits(amax);
+	}
+
+	void shrink_to_fit() /* noexcept */
+	{
+		if (aux::pow2_roundup(size()) < capacity())
+			swap_to_fit();
 	}
 
 	basic_bitvector& set() noexcept
@@ -553,6 +564,15 @@ private:
 
 		std::copy_n(v.begin(), n, p_);
 		std::fill_n(p_ + n, cap_ - n, _zeros());
+	}
+
+	void swap_to_fit()
+	try
+	{
+		basic_bitvector(*this, alloc_).swap(*this);
+	}
+	catch (...)
+	{
 	}
 
 	_block_const_iterator begin() const
