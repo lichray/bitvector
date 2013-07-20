@@ -369,6 +369,23 @@ public:
 		--size_;
 	}
 
+	void resize(std::size_t n, bool value = false)
+	{
+		auto oldn = bits_to_count(size());
+		auto newn = bits_to_count(n);
+
+		expand_to_hold(n);
+		if (has_incomplete_block() and size() < n)
+			last_block() = value ?
+				oned_last_block() :
+				zeroed_last_block();
+
+		size_ = (size_ & _bits_in_use) ^ n;
+		if (oldn < newn)
+			std::fill(begin() + oldn, end(),
+			    value ? _ones() : _zeros());
+	}
+
 	void swap(basic_bitvector& v) noexcept(
 	    is_nothrow_swappable<allocator_type>())
 	{
@@ -455,6 +472,11 @@ private:
 		return bit_index(size());
 	}
 
+	_block_type& last_block()
+	{
+		return *filled_end();
+	}
+
 	_block_type last_block() const
 	{
 		return *filled_end();
@@ -468,6 +490,11 @@ private:
 	_block_type dezeroed_last_block() const
 	{
 		return ~last_block() & extra_mask();
+	}
+
+	_block_type oned_last_block() const
+	{
+		return last_block() | ~extra_mask();
 	}
 
 	_block_type extra_mask() const
@@ -523,6 +550,11 @@ private:
 	_block_iterator begin()
 	{
 		return vec_;
+	}
+
+	_block_iterator filled_end()
+	{
+		return vec_ + block_index(size());
 	}
 
 	_block_iterator end()

@@ -67,8 +67,11 @@ int main()
 	v.pop_back();
 	std::cout << "size after popped:\t" << v.size() << std::endl;
 
+	v.resize(277, 1);
+	std::cout << "popcount after resized:\t" << v.count() << std::endl;
+
 	v.clear();
-	std::cout << "size after clearred:\t" << v.size() << std::endl;
+	std::cout << "size after cleared:\t" << v.size() << std::endl;
 
 	v = v2;
 	std::cout << "popcount after assign:\t" << v.count() << std::endl;
