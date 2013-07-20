@@ -199,17 +199,17 @@ public:
 		v.size_ = _bits_in_use;
 	}
 
+	~basic_bitvector() noexcept
+	{
+		if (not using_bits())
+			deallocate();
+	}
+
 	// WIP: N2525
 	basic_bitvector& operator=(basic_bitvector v)
 	{
 		swap(v);
 		return *this;
-	}
-
-	~basic_bitvector() noexcept
-	{
-		if (not using_bits())
-			deallocate();
 	}
 
 	reference operator[](std::size_t pos)
