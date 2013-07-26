@@ -69,7 +69,8 @@ private:
 	static constexpr auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
 	static constexpr auto _bits_per_block =
 		std::numeric_limits<_block_type>::digits;
-	static constexpr auto _blocks_internal = _bits_internal / _bits_per_block;
+	static constexpr auto _blocks_internal =
+		_bits_internal / _bits_per_block;
 	static constexpr auto _bits_in_use = bit_mask(_bits_per_block - 1);
 
 	using _bits = _block_type[_blocks_internal];
@@ -77,7 +78,7 @@ private:
 	    "unsupported representation");
 
 	using _zeros = std::integral_constant<_block_type, 0>;
-	using _ones = std::integral_constant<_block_type, ~_zeros()>;
+	using _ones = std::integral_constant<_block_type, _block_type(~0)>;
 
 public:
 

@@ -121,7 +121,7 @@ template <std::size_t I, std::size_t N>
 struct set_bit1_loop
 {
 	template <typename Int, typename RandomAccessIterator, typename T>
-	static void apply(Int i, RandomAccessIterator it, T const& one,
+	static void apply(Int i, RandomAccessIterator it, T one,
 	    std::random_access_iterator_tag tag)
 	{
 		if (i & (Int(1) << (N - I)))
@@ -134,7 +134,7 @@ template <std::size_t N>
 struct set_bit1_loop<N, N>
 {
 	template <typename Int, typename RandomAccessIterator, typename T>
-	static void apply(Int i, RandomAccessIterator it, T const& one,
+	static void apply(Int i, RandomAccessIterator it, T one,
 	    std::random_access_iterator_tag)
 	{
 		if (i & Int(1))
@@ -143,14 +143,14 @@ struct set_bit1_loop<N, N>
 };
 
 template <int Width, typename Int, typename Iter, typename T>
-inline void fill_bit1_impl(Int i, Iter it, T const& one)
+inline void fill_bit1_impl(Int i, Iter it, T one)
 {
 	set_bit1_loop<0, Width - 1>::apply(i, it, one,
 	    typename std::iterator_traits<Iter>::iterator_category());
 }
 
 template <typename Int, typename Iter, typename T>
-inline void fill_bit1(Int i, Iter it, T const& one)
+inline void fill_bit1(Int i, Iter it, T one)
 {
 	constexpr auto digits = std::numeric_limits<Int>::digits;
 	fill_bit1_impl<digits>(i, it, one);
@@ -165,7 +165,7 @@ struct fill_bit1_upto_impl<Low, High, Mid,
 	typename std::enable_if<(Low > High)>::type>
 {
 	template <typename Int, typename Iter, typename T>
-	static void apply(size_t n, Int i, Iter it, T const& one)
+	static void apply(size_t n, Int i, Iter it, T one)
 	{
 		throw 1;
 	}
@@ -175,7 +175,7 @@ template <int Mid>
 struct fill_bit1_upto_impl<Mid, Mid, Mid, void>
 {
 	template <typename Int, typename Iter, typename T>
-	static void apply(size_t n, Int i, Iter it, T const& one)
+	static void apply(size_t n, Int i, Iter it, T one)
 	// precondition: n == Mid
 	{
 		fill_bit1_impl<Mid>(i, it, one);
@@ -187,7 +187,7 @@ struct fill_bit1_upto_impl<Low, High, Mid,
 	typename std::enable_if<(Low < High)>::type>
 {
 	template <typename Int, typename Iter, typename T>
-	static void apply(size_t n, Int i, Iter it, T const& one)
+	static void apply(size_t n, Int i, Iter it, T one)
 	// precondition: Low <= n or n <= High
 	{
 		if (n < Mid)
@@ -200,7 +200,7 @@ struct fill_bit1_upto_impl<Low, High, Mid,
 };
 
 template <typename Int, typename Iter, typename T>
-inline void fill_bit1_upto(size_t n, Int i, Iter it, T const& one)
+inline void fill_bit1_upto(size_t n, Int i, Iter it, T one)
 // precondition: 0 < n <= bitsof(Int)
 {
 	constexpr auto digits = std::numeric_limits<Int>::digits;
