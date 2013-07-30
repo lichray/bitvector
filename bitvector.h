@@ -56,9 +56,31 @@ private:
 		std::size_t cap;
 	};
 
+	static constexpr auto _bits_per_block =
+		std::numeric_limits<_block_type>::digits;
+
+	template <int N = _bits_per_block>
+	static constexpr std::size_t count_to_bits(std::size_t n)
+	{
+		return n * N;
+	}
+
+	template <int N = _bits_per_block>
+	static constexpr std::size_t bits_to_count(std::size_t n)
+	{
+		return (n + (N - 1)) / N;
+	}
+
+	template <int N = _bits_per_block>
+	static constexpr std::size_t block_index(std::size_t n)
+	{
+		return n / N;
+	}
+
+	template <int N = _bits_per_block>
 	static constexpr std::size_t bit_index(std::size_t n)
 	{
-		return n % _bits_per_block;
+		return n % N;
 	}
 
 	static constexpr _block_type bit_mask(std::size_t n)
@@ -66,12 +88,12 @@ private:
 		return _block_type(1) << bit_index(n);
 	}
 
-	static constexpr auto _bits_internal = sizeof(_blocks) * CHAR_BIT;
-	static constexpr auto _bits_per_block =
-		std::numeric_limits<_block_type>::digits;
+	static constexpr auto _bits_internal =
+		count_to_bits<CHAR_BIT>(sizeof(_blocks));
 	static constexpr auto _blocks_internal =
-		_bits_internal / _bits_per_block;
-	static constexpr auto _bits_in_use = bit_mask(_bits_per_block - 1);
+		bits_to_count(_bits_internal);
+	static constexpr auto _bits_in_use =
+		bit_mask(_bits_per_block - 1);
 
 	using _bits = _block_type[_blocks_internal];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
@@ -673,21 +695,6 @@ private:
 #undef p_
 #undef bits_
 #undef vec_
-
-	static std::size_t count_to_bits(std::size_t n)
-	{
-		return n * _bits_per_block;
-	}
-
-	static std::size_t bits_to_count(std::size_t n)
-	{
-		return (n + (_bits_per_block - 1)) / _bits_per_block;
-	}
-
-	static std::size_t block_index(std::size_t n)
-	{
-		return n / _bits_per_block;
-	}
 
 	static std::size_t actual_size(std::size_t n)
 	{
