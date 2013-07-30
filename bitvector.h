@@ -218,7 +218,7 @@ public:
 	basic_bitvector(basic_bitvector&& v) noexcept(
 	    std::is_nothrow_move_constructible<allocator_type>()) :
 		st_(v.st_),
-		sz_alloc_(v.sz_alloc_)
+		sz_alloc_(std::move(v.sz_alloc_))
 	{
 		// minimal change to prevent deallocation
 		v.size_ = _bits_in_use;
