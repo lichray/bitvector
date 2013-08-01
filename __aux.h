@@ -207,6 +207,64 @@ inline void fill_bit1_upto(size_t n, Int i, Iter it, T one)
 	fill_bit1_upto_impl<1, digits>::apply(n, i, it, one);
 }
 
+template <unsigned char Byte, int I>
+struct parse_byte_impl
+{
+	template <typename Iter, typename UnaryPredicate>
+	static auto apply(Iter it, UnaryPredicate f) -> unsigned char
+	{
+		if (f(*it))
+			return parse_byte_impl<(Byte << 1) ^ 1, I + 1>::apply(
+			    ++it, f);
+		else
+			return parse_byte_impl<(Byte << 1), I + 1>::apply(
+			    ++it, f);
+	}
+
+	template <typename Iter, typename UnaryPredicate>
+	static auto apply(Iter it, Iter ed, UnaryPredicate f) -> unsigned char
+	// precondition: distance(it, ed) <= CHAR_BIT
+	{
+		if (it == ed)
+			return Byte;
+		if (f(*it))
+			return parse_byte_impl<(Byte << 1) ^ 1, I + 1>::apply(
+			    ++it, ed, f);
+		else
+			return parse_byte_impl<(Byte << 1), I + 1>::apply(
+			    ++it, ed, f);
+	}
+};
+
+template <unsigned char Byte>
+struct parse_byte_impl<Byte, CHAR_BIT>
+{
+	template <typename Iter, typename UnaryPredicate>
+	static auto apply(Iter it, UnaryPredicate f) -> unsigned char
+	{
+		return Byte;
+	}
+
+	template <typename Iter, typename UnaryPredicate>
+	static auto apply(Iter it, Iter ed, UnaryPredicate f) -> unsigned char
+	// precondition: it == ed
+	{
+		return Byte;
+	}
+};
+
+template <typename Iter, typename UnaryPredicate>
+inline auto parse_byte(Iter it, UnaryPredicate f) -> unsigned char
+{
+	return parse_byte_impl<0, 0>::apply(it, f);
+}
+
+template <typename Iter, typename UnaryPredicate>
+inline auto parse_byte(Iter it, Iter ed, UnaryPredicate f) -> unsigned char
+{
+	return parse_byte_impl<0, 0>::apply(it, ed, f);
+}
+
 }
 
 template <typename Iter>

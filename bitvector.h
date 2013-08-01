@@ -240,6 +240,64 @@ public:
 		}
 	}
 
+	template <typename charT, typename traits, typename _Allocator>
+	explicit basic_bitvector(std::basic_string<charT, traits, _Allocator>
+	    const& str,
+	    typename std::basic_string<charT, traits, _Allocator>::
+	    size_type pos = 0,
+	    typename std::basic_string<charT, traits, _Allocator>::
+	    size_type n = (std::basic_string<charT, traits, _Allocator>::npos),
+	    charT zero = charT('0'),
+	    charT one = charT('1')) :
+		basic_bitvector(str, {}, pos, n, zero, one)
+	{}
+
+	template <typename charT>
+	explicit basic_bitvector(charT const* str,
+	    typename std::basic_string<charT>::
+	    size_type n = (std::basic_string<charT>::npos),
+	    charT zero = charT('0'),
+	    charT one = charT('1')) :
+		basic_bitvector(str, {}, n, zero, one)
+	{}
+
+	template <typename charT, typename traits, typename _Allocator>
+	explicit basic_bitvector(std::basic_string<charT, traits, _Allocator>
+	    const& str,
+	    allocator_type const& a,
+	    typename std::basic_string<charT, traits, _Allocator>::
+	    size_type pos = 0,
+	    typename std::basic_string<charT, traits, _Allocator>::
+	    size_type n = (std::basic_string<charT, traits, _Allocator>::npos),
+	    charT zero = charT('0'),
+	    charT one = charT('1')) :
+		sz_alloc_(_bits_in_use, a)
+	{
+		if (pos > str.size())
+			throw std::out_of_range(
+			    "basic_bitvector::basic_bitvector");
+
+		auto it = std::begin(str) + pos;
+		auto sz = std::min(n, str.size() - pos);
+
+		from_string<traits>(it, sz, zero, one);
+	}
+
+	template <typename charT>
+	explicit basic_bitvector(charT const* str,
+	    allocator_type const& a,
+	    typename std::basic_string<charT>::
+	    size_type n = (std::basic_string<charT>::npos),
+	    charT zero = charT('0'),
+	    charT one = charT('1')) :
+		sz_alloc_(_bits_in_use, a)
+	{
+		using traits = typename std::basic_string<charT>::traits_type;
+		auto sz = std::min(n, traits::length(str));
+
+		from_string<traits>(str, sz, zero, one);
+	}
+
 	~basic_bitvector() noexcept
 	{
 		if (not using_bits())
@@ -653,6 +711,46 @@ private:
 	void deallocate()
 	{
 		_alloc_traits::deallocate(alloc_, p_, cap_);
+	}
+
+	template <typename traits,
+		  typename Iter, typename Size, typename charT>
+	void from_string(Iter it, Size sz, charT zero, charT one)
+	{
+		if (not std::all_of(it, it + sz,
+		    [=](charT c)
+		    {
+			return traits::eq(c, zero) or traits::eq(c, one);
+		    }))
+			throw std::invalid_argument(
+			    "basic_bitvector::basic_bitvector");
+
+		expand_to_hold(sz);
+		set_size(sz);
+
+		auto bytes = reverser(reinterpret_cast<unsigned char*>(vec_) +
+		    bits_to_count<CHAR_BIT>(sz));
+
+		auto is_one = [=](charT c)
+		    {
+			return traits::eq(c, one);
+		    };
+
+		auto extra = bit_index<CHAR_BIT>(sz);
+		if (extra)
+		{
+			*bytes = aux::parse_byte(it, it + extra, is_one);
+			++bytes;
+			it += extra;
+		}
+
+		std::generate_n(bytes, block_index<CHAR_BIT>(sz),
+		    [&]
+		    {
+			auto byte = aux::parse_byte(it, is_one);
+			it += CHAR_BIT;
+			return byte;
+		    });
 	}
 
 	template <typename R>

@@ -99,11 +99,7 @@ int main()
 	stdex::basic_bitvector<std::allocator<unsigned char>> v4;
 	std::cout << "ulong of 0b(empty):\t" << v4.to_ulong() << std::endl;
 
-	v4.push_back(1);
-	v4.push_back(1);
-	v4.push_back(0);
-	v4.push_back(0);
-	v4.push_back(1);
+	v4 = decltype(v4)("10011");
 	std::cout << "ulong of 0b" << v4.to_string() << ":\t"
 		<< v4.to_ulong() << std::endl;
 
@@ -113,4 +109,9 @@ int main()
 	v4.push_back(1);
 	std::cout << "ulong of 0b" << v4.to_string() << ":\t"
 		<< v4.to_ulong() << std::endl;
+
+	std::string s("0bXXYYYYXX");
+	decltype(v4) v6(s, 2, s.size(), 'X', 'Y');
+	std::cout << "string of " << s << ":\t"
+		<< v6.to_string() << std::endl;
 }
