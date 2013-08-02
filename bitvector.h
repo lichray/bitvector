@@ -592,9 +592,15 @@ private:
 		return extra_size() != 0;
 	}
 
+	bool has_incomplete_byte() const
+	{
+		return extra_size<CHAR_BIT>() != 0;
+	}
+
+	template <int N = _bits_per_block>
 	std::size_t extra_size() const
 	{
-		return bit_index(size());
+		return bit_index<N>(size());
 	}
 
 	_block_type& last_block()
@@ -735,9 +741,9 @@ private:
 			return traits::eq(c, one);
 		    };
 
-		auto extra = bit_index<CHAR_BIT>(sz);
-		if (extra)
+		if (has_incomplete_byte())
 		{
+			auto extra = extra_size<CHAR_BIT>();
 			*bytes = aux::parse_byte(it, it + extra, is_one);
 			++bytes;
 			it += extra;
