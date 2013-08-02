@@ -775,21 +775,15 @@ private:
 	template <typename R>
 	R as_integral(std::false_type) const
 	{
-		if (begin() == filled_end())
-			return zeroed_last_block();
-
 		auto r =
-		    std::accumulate(begin() + 1, filled_end(),
-		    R(begin()[0]),
+		    std::accumulate(reverser(filled_end()), reverser(begin()),
+		    has_incomplete_block() ? R(zeroed_last_block()) : R(0),
 		    [](R r, _block_type v)
 		    {
-			return r ^ (R(v) << _bits_per_block);
+			return (r << _bits_per_block) ^ v;
 		    });
 
-		if (has_incomplete_block())
-			return r ^ (R(zeroed_last_block()) << _bits_per_block);
-		else
-			return r;
+		return r;
 	}
 
 #undef size_
