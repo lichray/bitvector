@@ -524,9 +524,9 @@ public:
 
 		if (has_incomplete_block())
 		{
-			aux::fill_bit1_upto(extra_size(),
-			    last_block(), it, one);
-			it += extra_size();
+			auto extra = extra_size();
+			aux::fill_bit1_upto(extra, last_block(), it, one);
+			it += extra;
 		}
 
 		std::for_each(reverser(filled_end()), reverser(begin()),
