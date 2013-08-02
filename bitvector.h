@@ -157,7 +157,6 @@ public:
 #define cap_	st_.blocks.cap
 #define p_	st_.blocks.p
 #define bits_	st_.bits
-#define vec_	(using_bits() ? bits_ : p_)
 
 	basic_bitvector() noexcept(
 	    std::is_nothrow_default_constructible<allocator_type>()) :
@@ -326,12 +325,12 @@ public:
 
 	reference operator[](std::size_t pos)
 	{
-		return { vec_[block_index(pos)], bit_mask(pos) };
+		return { begin()[block_index(pos)], bit_mask(pos) };
 	}
 
 	bool operator[](std::size_t pos) const
 	{
-		return vec_[block_index(pos)] & bit_mask(pos);
+		return begin()[block_index(pos)] & bit_mask(pos);
 	}
 
 	bool test(std::size_t pos) const
@@ -567,17 +566,17 @@ private:
 
 	void set_bit(std::size_t pos)
 	{
-		vec_[block_index(pos)] |= bit_mask(pos);
+		begin()[block_index(pos)] |= bit_mask(pos);
 	}
 
 	void unset_bit(std::size_t pos)
 	{
-		vec_[block_index(pos)] &= ~bit_mask(pos);
+		begin()[block_index(pos)] &= ~bit_mask(pos);
 	}
 
 	void flip_bit(std::size_t pos)
 	{
-		vec_[block_index(pos)] ^= bit_mask(pos);
+		begin()[block_index(pos)] ^= bit_mask(pos);
 	}
 
 	void assign_to(bool value)
@@ -679,27 +678,27 @@ private:
 
 	_block_const_iterator begin() const
 	{
-		return vec_;
+		return using_bits() ? bits_ : p_;
 	}
 
 	_block_const_iterator filled_end() const
 	{
-		return vec_ + block_index(size());
+		return begin() + block_index(size());
 	}
 
 	_block_iterator begin()
 	{
-		return vec_;
+		return using_bits() ? bits_ : p_;
 	}
 
 	_block_iterator filled_end()
 	{
-		return vec_ + block_index(size());
+		return begin() + block_index(size());
 	}
 
 	_block_iterator end()
 	{
-		return vec_ + bits_to_count(size());
+		return begin() + bits_to_count(size());
 	}
 
 	void allocate(std::size_t n)
@@ -728,8 +727,8 @@ private:
 		expand_to_hold(sz);
 		set_size(sz);
 
-		auto bytes = reverser(reinterpret_cast<unsigned char*>(vec_) +
-		    bits_to_count<CHAR_BIT>(sz));
+		auto bytes = reverser(reinterpret_cast<
+		    unsigned char*>(begin()) + bits_to_count<CHAR_BIT>(sz));
 
 		auto is_one = [=](charT c)
 		    {
@@ -775,7 +774,7 @@ private:
 
 		auto r =
 		    std::accumulate(begin() + 1, filled_end(),
-		    R(vec_[0]),
+		    R(begin()[0]),
 		    [](R r, _block_type v)
 		    {
 			return r ^ (R(v) << _bits_per_block);
@@ -792,7 +791,6 @@ private:
 #undef cap_
 #undef p_
 #undef bits_
-#undef vec_
 
 	static std::size_t actual_size(std::size_t n)
 	{
