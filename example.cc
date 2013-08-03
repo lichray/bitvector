@@ -115,14 +115,14 @@ int main()
 	std::cout << "string of " << s << ":\t"
 		<< v6.to_string() << std::endl;
 
-	stdex::bitvector v7(v6.to_string());
+	v2 = v6;
 
 	std::cout
 		<< "equal to self:\t\t" << (v6 == v6) << std::endl
 		<< "equal to diff content:\t" << (v6 == v4) << std::endl
-		<< "equal to diff type:\t" << (v6 == v7) << std::endl
+		<< "equal to diff type:\t" << (v6 == v2) << std::endl
 		;
 
-	decltype(v4) v8(v.to_string());
+	decltype(v4) v8(v);
 	std::cout << "try a larger case:\t" << (v == v8) << std::endl;
 }

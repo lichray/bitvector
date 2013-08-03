@@ -218,6 +218,26 @@ public:
 		}
 	}
 
+	template <typename Alloc>
+	basic_bitvector(basic_bitvector<Alloc> const& v) :
+		basic_bitvector(v, static_cast<allocator_type>(v.alloc_))
+	{}
+
+	template <typename Alloc>
+	basic_bitvector(basic_bitvector<Alloc> const& v,
+	    allocator_type const& a,
+	    typename std::enable_if<
+	    same_allocator<Allocator, Alloc>::value>::type* = 0) :
+		sz_alloc_(v.size_, a)
+	{
+		auto sz = v.size();
+
+		init_to_hold(sz);
+		size_ ^= sz;
+
+		std::memcpy(begin(), v.begin(), bits_to_count<CHAR_BIT>(sz));
+	}
+
 	basic_bitvector(basic_bitvector&& v) noexcept(
 	    std::is_nothrow_move_constructible<allocator_type>()) :
 		st_(v.st_),
