@@ -508,8 +508,10 @@ public:
 
 	void push_back(bool value)
 	{
-		expand_to_hold(size() + 1);
-		set_bit_to(size(), value);
+		auto i = size();
+
+		expand_to_hold(i + 1);
+		set_bit_to(i, value);
 		++size_;
 	}
 
@@ -520,11 +522,12 @@ public:
 
 	void resize(std::size_t n, bool value = false)
 	{
-		auto oldn = bits_to_count(size());
+		auto sz = size();
+		auto oldn = bits_to_count(sz);
 		auto newn = bits_to_count(n);
 
 		expand_to_hold(n);
-		if (has_incomplete_block() and size() < n)
+		if (has_incomplete_block() and sz < n)
 			last_block() = value ?
 				oned_last_block() :
 				zeroed_last_block();
