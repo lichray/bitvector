@@ -717,9 +717,12 @@ private:
 
 	void copy_to_heap(basic_bitvector const& v)
 	{
-		auto n = bits_to_count(v.size());
+		std::copy(v.begin(), v.end(), p_);
+	}
 
-		std::copy_n(v.begin(), n, p_);
+	void init_after(std::size_t sz)
+	{
+		auto n = bits_to_count(sz);
 		std::fill_n(p_ + n, cap_ - n, _zeros());
 	}
 
@@ -740,6 +743,11 @@ private:
 	_block_const_iterator filled_end() const
 	{
 		return begin() + block_index(size());
+	}
+
+	_block_const_iterator end() const
+	{
+		return begin() + bits_to_count(size());
 	}
 
 	_block_iterator begin()
@@ -767,6 +775,7 @@ private:
 	void allocate_preferred(std::size_t sz)
 	{
 		allocate(aux::pow2_roundup(sz));
+		init_after(sz);
 	}
 
 	void deallocate()
