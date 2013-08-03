@@ -92,8 +92,8 @@ private:
 		count_to_bits<CHAR_BIT>(sizeof(_blocks));
 	static constexpr auto _blocks_internal =
 		bits_to_count(_bits_internal);
-	static constexpr auto _bits_in_use =
-		bit_mask(_bits_per_block - 1);
+	static constexpr auto _bits_in_use = std::size_t(1) <<
+		(std::numeric_limits<std::size_t>::digits - 1);
 
 	using _bits = _block_type[_blocks_internal];
 	static_assert(sizeof(_bits) == sizeof(_blocks),
