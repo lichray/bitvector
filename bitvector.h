@@ -175,7 +175,7 @@ public:
 	    allocator_type const& a = allocator_type()) :
 		sz_alloc_(_bits_in_use, a)
 	{
-		expand_to_hold(n);
+		init_to_hold(n);
 		size_ ^= n;
 
 		reset();
@@ -185,7 +185,7 @@ public:
 	    allocator_type const& a = allocator_type()) :
 		sz_alloc_(_bits_in_use, a)
 	{
-		expand_to_hold(n);
+		init_to_hold(n);
 		size_ ^= n;
 
 		assign_to(value);
@@ -699,6 +699,17 @@ private:
 		}
 	}
 
+	void init_to_hold(std::size_t sz)
+	{
+		if (sz > _bits_internal) {
+			if (sz > max_size())
+				throw std::length_error("bitvector");
+
+			allocate_preferred(sz);
+			size_ = 0;
+		}
+	}
+
 	void set_size(std::size_t sz)
 	{
 		size_ = (size_ & _bits_in_use) ^ sz;
@@ -775,8 +786,8 @@ private:
 			throw std::invalid_argument(
 			    "basic_bitvector::basic_bitvector");
 
-		expand_to_hold(sz);
-		set_size(sz);
+		init_to_hold(sz);
+		size_ ^= sz;
 
 		auto bytes = reverser(reinterpret_cast<
 		    unsigned char*>(begin()) + bits_to_count<CHAR_BIT>(sz));
