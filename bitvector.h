@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <numeric>
 #include <string>
+#include <cstring>
 
 namespace stdex {
 
@@ -42,6 +43,9 @@ struct basic_bitvector
 	typedef Allocator allocator_type;
 
 private:
+	template <typename>
+	friend struct basic_bitvector;
+
 	typedef std::allocator_traits<allocator_type> _alloc_traits;
 	typedef typename _alloc_traits::value_type _block_type;
 	static_assert(std::is_unsigned<_block_type>(),
@@ -321,6 +325,24 @@ public:
 	allocator_type get_allocator() const noexcept
 	{
 		return alloc_;
+	}
+
+	template <typename Alloc>
+	bool operator==(basic_bitvector<Alloc> const& rhs) const
+	{
+		using Block = typename basic_bitvector<Alloc>::_block_type;
+
+		if (size() != rhs.size())
+			return false;
+		else
+			return equals(rhs, std::integral_constant<bool,
+			    std::is_same<_block_type, Block>::value>());
+	}
+
+	template <typename Alloc>
+	bool operator!=(basic_bitvector<Alloc> const& rhs) const
+	{
+		return !(*this == rhs);
 	}
 
 	reference operator[](std::size_t pos)
@@ -633,6 +655,13 @@ private:
 		return _ones() >> (_bits_per_block - extra_size());
 	}
 
+	unsigned char zeroed_last_byte() const
+	{
+		return *(reinterpret_cast<unsigned char const*>(begin()) +
+		    block_index<CHAR_BIT>(size())) &
+		    (UCHAR_MAX >> (CHAR_BIT - extra_size<CHAR_BIT>()));
+	}
+
 	bool using_bits() const
 	{
 		return size_ & _bits_in_use;
@@ -784,6 +813,33 @@ private:
 		    });
 
 		return r;
+	}
+
+	template <typename _Allocator>
+	bool equals(basic_bitvector<_Allocator> const& rhs,
+	    std::true_type) const
+	{
+		auto r = std::equal(begin(), filled_end(), rhs.begin());
+
+		if (has_incomplete_block())
+			return r and (zeroed_last_block() ==
+			    rhs.zeroed_last_block());
+		else
+			return r;
+	}
+
+	template <typename _Allocator>
+	bool equals(basic_bitvector<_Allocator> const& rhs,
+	    std::false_type) const
+	{
+		auto r = !std::memcmp(begin(), rhs.begin(),
+		    block_index<CHAR_BIT>(size()));
+
+		if (has_incomplete_byte())
+			return r and (zeroed_last_byte() ==
+			    rhs.zeroed_last_byte());
+		else
+			return r;
 	}
 
 #undef size_
