@@ -213,7 +213,7 @@ public:
 		// heap -> shrunk heap
 		else
 		{
-			allocate(aux::pow2_roundup(bits_to_count(v.size_)));
+			allocate_preferred(v.size_);
 			copy_to_heap(v);
 		}
 	}
@@ -238,7 +238,7 @@ public:
 		}
 		else
 		{
-			allocate(aux::pow2_roundup(bits_to_count(v.size_)));
+			allocate_preferred(v.size_);
 			copy_to_heap(v);
 		}
 	}
@@ -682,7 +682,7 @@ private:
 				throw std::length_error("bitvector");
 
 			basic_bitvector v(alloc_);
-			v.allocate(aux::pow2_roundup(bits_to_count(sz)));
+			v.allocate_preferred(sz);
 			v.size_ = size();
 			v.copy_to_heap(*this);
 			swap(v);
@@ -736,10 +736,16 @@ private:
 		return begin() + bits_to_count(size());
 	}
 
-	void allocate(std::size_t n)
+	void allocate(std::size_t sz)
 	{
+		auto n = bits_to_count(sz);
 		p_ = _alloc_traits::allocate(alloc_, n);
 		cap_ = n;
+	}
+
+	void allocate_preferred(std::size_t sz)
+	{
+		allocate(aux::pow2_roundup(sz));
 	}
 
 	void deallocate()
