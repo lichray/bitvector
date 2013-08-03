@@ -340,13 +340,10 @@ public:
 	template <typename Alloc>
 	bool operator==(basic_bitvector<Alloc> const& rhs) const
 	{
-		using Block = typename basic_bitvector<Alloc>::_block_type;
-
 		if (size() != rhs.size())
 			return false;
 		else
-			return equals(rhs, std::integral_constant<bool,
-			    std::is_same<_block_type, Block>::value>());
+			return equals(rhs);
 	}
 
 	template <typename Alloc>
@@ -852,6 +849,17 @@ private:
 		    });
 
 		return r;
+	}
+
+	template <typename _Allocator>
+	auto equals(basic_bitvector<_Allocator> const& rhs) const
+		-> typename std::enable_if<
+		same_allocator<Allocator, _Allocator>::value, bool>::type
+	{
+		using Block = typename basic_bitvector<_Allocator>::_block_type;
+
+		return equals(rhs, std::integral_constant<bool,
+		    std::is_same<_block_type, Block>::value>());
 	}
 
 	template <typename _Allocator>

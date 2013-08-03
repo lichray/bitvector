@@ -30,6 +30,7 @@
 #include <limits>
 #include <type_traits>
 #include <iterator>
+#include <memory>
 
 namespace stdex {
 namespace aux {
@@ -266,6 +267,13 @@ inline auto parse_byte(Iter it, Iter ed, UnaryPredicate f) -> unsigned char
 }
 
 }
+
+template <typename Alloc1, typename Alloc2>
+struct same_allocator : std::integral_constant<bool,
+	std::is_same<typename std::allocator_traits<Alloc2>::template
+	    rebind_alloc<typename std::allocator_traits<Alloc1>::value_type>,
+	    Alloc1>::value>
+{};
 
 template <typename Iter>
 inline auto reverser(Iter it) -> std::reverse_iterator<Iter>
