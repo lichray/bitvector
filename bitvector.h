@@ -213,7 +213,7 @@ public:
 		// heap -> shrunk heap
 		else
 		{
-			allocate_preferred(v.size_);
+			allocate_preferred(v.size());
 			copy_to_heap(v);
 		}
 	}
@@ -230,15 +230,25 @@ public:
 	basic_bitvector(basic_bitvector&& v, allocator_type const& a) :
 		sz_alloc_(v.size_, a)
 	{
+		// exchangeable, or internal -> internal
 		if (alloc_ == v.alloc_ or v.using_bits())
 		{
 			st_ = v.st_;
 			// minimal change to prevent deallocation
 			v.size_ = _bits_in_use;
 		}
+
+		// heap -> internal
+		else if (v.size() <= _bits_internal)
+		{
+			std::copy_n(v.p_, _blocks_internal, bits_);
+			size_ ^= _bits_in_use;
+		}
+
+		// heap -> heap
 		else
 		{
-			allocate_preferred(v.size_);
+			allocate_preferred(v.size());
 			copy_to_heap(v);
 		}
 	}
@@ -696,7 +706,7 @@ private:
 
 	void copy_to_heap(basic_bitvector const& v)
 	{
-		auto n = bits_to_count(size_);
+		auto n = bits_to_count(v.size());
 
 		std::copy_n(v.begin(), n, p_);
 		std::fill_n(p_ + n, cap_ - n, _zeros());
