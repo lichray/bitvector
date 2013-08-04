@@ -778,7 +778,8 @@ private:
 	void swap_to_fit()
 	try
 	{
-		basic_bitvector(*this, alloc_).swap(*this);
+		basic_bitvector v(*this);
+		swap(v);
 	}
 	catch (...)
 	{
