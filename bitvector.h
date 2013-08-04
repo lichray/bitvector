@@ -467,6 +467,16 @@ public:
 			swap_to_fit();
 	}
 
+	template <typename Alloc>
+	basic_bitvector& operator&=(basic_bitvector<Alloc> const& v)
+	{
+		if (size() != v.size())
+			throw std::invalid_argument(
+			    "basic_bitvector::operator&=");
+
+		return transformed_by(bit_and(), v);
+	}
+
 	basic_bitvector& set() noexcept
 	{
 		std::fill(begin(), end(), _ones());
@@ -917,6 +927,45 @@ private:
 		else
 			return r;
 	}
+
+	template <typename BinaryOperation, typename _Allocator>
+	auto transformed_by(BinaryOperation f,
+	    basic_bitvector<_Allocator> const& v)
+		-> typename std::enable_if<
+		same_allocator<Allocator, _Allocator>::value,
+		basic_bitvector&>::type
+	{
+		using Block = typename basic_bitvector<_Allocator>::_block_type;
+
+		transformed_by(f, v, std::integral_constant<bool,
+		    std::is_same<_block_type, Block>::value>());
+
+		return *this;
+	}
+
+	template <typename BinaryOperation, typename _Allocator>
+	void transformed_by(BinaryOperation f,
+	    basic_bitvector<_Allocator> const& v,
+	    std::true_type)
+	{
+		std::transform(begin(), end(), v.begin(), begin(), f);
+	}
+
+	template <typename BinaryOperation, typename _Allocator>
+	void transformed_by(BinaryOperation f,
+	    basic_bitvector<_Allocator> const& v,
+	    std::false_type)
+	{
+		auto it = begin_of_bytes();
+
+		std::transform(it, it + bits_to_count<CHAR_BIT>(size()),
+		    v.begin_of_bytes(), it, f);
+	}
+
+	struct bit_and {
+	template <typename T>
+	T operator()(T l, T r) { return l & r; }
+	};
 
 #undef size_
 #undef alloc_
