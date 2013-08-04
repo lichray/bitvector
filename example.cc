@@ -123,8 +123,15 @@ int main()
 		<< "equal to diff type:\t" << (v6 == v2) << std::endl
 		;
 
+	v6.resize(v4.size());
+	std::cout << "content after resized:\t" << v6.to_string() << std::endl;
+
+	v6 ^= v4;
+	std::cout << "after ^= " << v4.to_string() << ":\t"
+		<< v6.to_string() << std::endl;
+
 	decltype(v4) v8(v);
-	std::cout << "try a larger case:\t" << (v == v8) << std::endl;
+	std::cout << "equal of a larger case:\t" << (v == v8) << std::endl;
 
 	v8.flip() &= v;
 	std::cout << "no bit set after &=:\t" << v8.none() << std::endl;

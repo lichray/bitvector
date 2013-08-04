@@ -477,6 +477,26 @@ public:
 		return transformed_by(bit_and(), v);
 	}
 
+	template <typename Alloc>
+	basic_bitvector& operator|=(basic_bitvector<Alloc> const& v)
+	{
+		if (size() != v.size())
+			throw std::invalid_argument(
+			    "basic_bitvector::operator|=");
+
+		return transformed_by(bit_or(), v);
+	}
+
+	template <typename Alloc>
+	basic_bitvector& operator^=(basic_bitvector<Alloc> const& v)
+	{
+		if (size() != v.size())
+			throw std::invalid_argument(
+			    "basic_bitvector::operator^=");
+
+		return transformed_by(bit_xor(), v);
+	}
+
 	basic_bitvector& set() noexcept
 	{
 		std::fill(begin(), end(), _ones());
@@ -965,6 +985,16 @@ private:
 	struct bit_and {
 	template <typename T>
 	T operator()(T l, T r) { return l & r; }
+	};
+
+	struct bit_or {
+	template <typename T>
+	T operator()(T l, T r) { return l | r; }
+	};
+
+	struct bit_xor {
+	template <typename T>
+	T operator()(T l, T r) { return l ^ r; }
 	};
 
 #undef size_
