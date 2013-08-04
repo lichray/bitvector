@@ -687,8 +687,7 @@ private:
 
 	unsigned char zeroed_last_byte() const
 	{
-		return *(reinterpret_cast<unsigned char const*>(begin()) +
-		    block_index<CHAR_BIT>(size())) &
+		return begin_of_bytes()[block_index<CHAR_BIT>(size())] &
 		    (UCHAR_MAX >> (CHAR_BIT - extra_size<CHAR_BIT>()));
 	}
 
@@ -785,6 +784,16 @@ private:
 		return begin() + bits_to_count(size());
 	}
 
+	unsigned char* begin_of_bytes()
+	{
+		return reinterpret_cast<unsigned char *>(begin());
+	}
+
+	unsigned char const* begin_of_bytes() const
+	{
+		return reinterpret_cast<unsigned char const*>(begin());
+	}
+
 	void allocate(std::size_t sz)
 	{
 		auto n = bits_to_count(sz);
@@ -818,8 +827,8 @@ private:
 		init_to_hold(sz);
 		size_ ^= sz;
 
-		auto bytes = reverser(reinterpret_cast<
-		    unsigned char*>(begin()) + bits_to_count<CHAR_BIT>(sz));
+		auto bytes = reverser(begin_of_bytes() +
+		    bits_to_count<CHAR_BIT>(sz));
 
 		auto is_one = [=](charT c)
 		    {
