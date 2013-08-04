@@ -497,6 +497,37 @@ public:
 		return transformed_by(bit_xor(), v);
 	}
 
+	template <typename Alloc>
+	basic_bitvector operator&(basic_bitvector<Alloc> const& rhs) const
+	{
+		basic_bitvector v(*this);
+		v &= rhs;
+		return v;
+	}
+
+	template <typename Alloc>
+	basic_bitvector operator|(basic_bitvector<Alloc> const& rhs) const
+	{
+		basic_bitvector v(*this);
+		v |= rhs;
+		return v;
+	}
+
+	template <typename Alloc>
+	basic_bitvector operator^(basic_bitvector<Alloc> const& rhs) const
+	{
+		basic_bitvector v(*this);
+		v ^= rhs;
+		return v;
+	}
+
+	basic_bitvector operator~() const
+	{
+		basic_bitvector v(*this);
+		v.flip();
+		return v;
+	}
+
 	basic_bitvector& set() noexcept
 	{
 		std::fill(begin(), end(), _ones());

@@ -133,6 +133,6 @@ int main()
 	decltype(v4) v8(v);
 	std::cout << "equal of a larger case:\t" << (v == v8) << std::endl;
 
-	v8.flip() &= v;
+	v8 &= ~v;
 	std::cout << "no bit set after &=:\t" << v8.none() << std::endl;
 }
