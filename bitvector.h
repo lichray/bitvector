@@ -395,7 +395,7 @@ public:
 		bool r = std::none_of(begin(), filled_end(),
 		    [](_block_type v) -> bool
 		    {
-			return ~v;
+			return static_cast<_block_type>(~v);
 		    });
 
 		if (!r)

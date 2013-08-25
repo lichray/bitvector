@@ -152,5 +152,6 @@ int main()
 
 	std::cout
 		<< "size after conversion:\t" << v9.size() << std::endl
+		<< "all with all bit set:\t" << v9.all() << std::endl
 		;
 }
