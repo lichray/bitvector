@@ -46,6 +46,8 @@ private:
 	template <typename>
 	friend struct basic_bitvector;
 
+	friend struct std::hash<basic_bitvector>;
+
 	typedef std::allocator_traits<allocator_type> _alloc_traits;
 	typedef typename _alloc_traits::value_type _block_type;
 	static_assert(std::is_unsigned<_block_type>(),
@@ -1140,6 +1142,21 @@ inline void swap(basic_bitvector<Allocator>& a, basic_bitvector<Allocator>& b)
 }
 
 typedef basic_bitvector<std::allocator<unsigned long>> bitvector;
+
+}
+
+namespace std {
+
+template <class Allocator>
+struct hash<stdex::basic_bitvector<Allocator>>
+	: unary_function<stdex::basic_bitvector<Allocator>, size_t>
+{
+	size_t operator()(stdex::basic_bitvector<Allocator> const& v) const
+		noexcept
+	{
+		return v.sz_alloc_.first();
+	}
+};
 
 }
 

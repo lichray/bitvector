@@ -1,6 +1,7 @@
 #include "bitvector.h"
 #include <iostream>
 #include <iomanip>
+#include <unordered_map>
 
 int main()
 {
@@ -154,4 +155,8 @@ int main()
 		<< "size after conversion:\t" << v9.size() << std::endl
 		<< "all with all bit set:\t" << v9.all() << std::endl
 		;
+
+	std::unordered_map<stdex::bitvector, int> m = {
+		{v, 1}, {v2, 2}, {v3, 4}, {v4, 8}
+	};
 }
