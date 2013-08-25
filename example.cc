@@ -146,4 +146,11 @@ int main()
 		<< "rshift by 8:\t\t" << (v7 >> 8).to_string() << std::endl
 		<< "rshift by 9:\t\t" << (v7 >> 9).to_string() << std::endl
 		;
+
+	stdex::basic_bitvector<
+		std::allocator<char16_t>> v9 = stdex::bitvector(64, true);
+
+	std::cout
+		<< "size after conversion:\t" << v9.size() << std::endl
+		;
 }

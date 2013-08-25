@@ -228,7 +228,7 @@ public:
 	    allocator_type const& a,
 	    typename std::enable_if<
 	    same_allocator<Allocator, Alloc>::value>::type* = 0) :
-		sz_alloc_(v.size_, a)
+		sz_alloc_(_bits_in_use, a)
 	{
 		auto sz = v.size();
 
