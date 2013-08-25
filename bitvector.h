@@ -528,6 +528,45 @@ public:
 		return v;
 	}
 
+	basic_bitvector& operator<<=(std::size_t pos)
+	{
+		if (pos >= size())
+			reset();
+		else
+			shift_left(begin(), end(), pos);
+
+		return *this;
+	}
+
+	basic_bitvector& operator>>=(std::size_t pos)
+	{
+		if (pos >= size())
+			reset();
+		else
+		{
+			if (has_incomplete_block())
+				last_block() = zeroed_last_block();
+
+			shift_right(begin(), end(), pos);
+		}
+
+		return *this;
+	}
+
+	basic_bitvector operator<<(std::size_t pos) const
+	{
+		basic_bitvector v(*this);
+		v <<= pos;
+		return v;
+	}
+
+	basic_bitvector operator>>(std::size_t pos) const
+	{
+		basic_bitvector v(*this);
+		v >>= pos;
+		return v;
+	}
+
 	basic_bitvector& set() noexcept
 	{
 		std::fill(begin(), end(), _ones());
@@ -1012,6 +1051,49 @@ private:
 
 		std::transform(it, it + bits_to_count<CHAR_BIT>(size()),
 		    v.begin_of_bytes(), it, f);
+	}
+
+	static void shift_left(_block_iterator first, _block_iterator last,
+	    std::size_t pos)
+	{
+		auto off = pos % _bits_per_block;
+		auto diff = _bits_per_block - off;
+		auto wipe = pos / _bits_per_block;
+		auto nfirst = first + wipe;
+		auto nlast = last - wipe;
+
+		if (diff == _bits_per_block)
+			std::copy_backward(first, nlast, last);
+		else
+			backward_difference(first, nlast, last,
+			    [=](_block_type cur, _block_type prev)
+			    {
+				return (cur << off) ^ (prev >> diff);
+			    });
+
+		std::fill(first, nfirst, _zeros());
+	}
+
+	static void shift_right(_block_iterator first, _block_iterator last,
+	    std::size_t pos)
+	{
+		auto off = pos % _bits_per_block;
+		auto diff = _bits_per_block - off;
+		auto wipe = pos / _bits_per_block;
+		auto nfirst = first + wipe;
+		auto nlast = last - wipe;
+
+		if (diff == _bits_per_block)
+			std::copy(nfirst, last, first);
+		else
+			backward_difference(reverser(last), reverser(nfirst),
+			    reverser(first),
+			    [=](_block_type cur, _block_type prev)
+			    {
+				return (cur >> off) ^ (prev << diff);
+			    });
+
+		std::fill(nlast, last, _zeros());
 	}
 
 	struct bit_and {

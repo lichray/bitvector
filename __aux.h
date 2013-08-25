@@ -281,6 +281,30 @@ inline auto reverser(Iter it) -> std::reverse_iterator<Iter>
 	return std::reverse_iterator<Iter>(it);
 }
 
+template <typename BidirectionalIterator1, typename BidirectionalIterator2,
+	  typename BinaryOperation>
+inline auto backward_difference(BidirectionalIterator1 first,
+    BidirectionalIterator1 last, BidirectionalIterator2 d_last,
+    BinaryOperation f) -> BidirectionalIterator2
+{
+	using value_t = typename std::iterator_traits<
+		BidirectionalIterator1>::value_type;
+
+	if (first == last)
+		return d_last;
+
+	value_t acc = *--last;
+	while (first != last)
+	{
+		value_t val = *--last;
+		*--d_last = f(acc, val);
+		acc = std::move(val);
+	}
+	*--d_last = f(acc, value_t());
+
+	return d_last;
+}
+
 }
 
 #endif

@@ -135,4 +135,15 @@ int main()
 
 	v8 &= ~v;
 	std::cout << "no bit set after &=:\t" << v8.none() << std::endl;
+
+	decltype(v4) v7(32, true);
+	v7.resize(20);
+
+	std::cout
+		<< "20 visible bits:\t" << v7.to_string() << std::endl
+		<< "lshift by 0:\t\t" << (v7 << 0).to_string() << std::endl
+		<< "lshift by 1:\t\t" << (v7 << 1).to_string() << std::endl
+		<< "rshift by 8:\t\t" << (v7 >> 8).to_string() << std::endl
+		<< "rshift by 9:\t\t" << (v7 >> 9).to_string() << std::endl
+		;
 }
